@@ -1,0 +1,48 @@
+name: Application checks
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "package.json"
+      - ".github/workflows/application-checks.yml"
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "package.json"
+      - ".github/workflows/application-checks.yml"
+
+jobs:
+  api:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: app/api
+    env:
+      DATABASE_URL: "file:./test.db"
+      AUTH_JWT_SECRET: "ci-secret-that-is-at-least-thirty-two-characters"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npm install
+        working-directory: .
+      - run: npx prisma generate --schema prisma/schema.prisma
+      - run: npx prisma db push --schema prisma/schema.prisma
+      - run: node --test
+
+  web:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: app/web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npm install
+        working-directory: .
+      - run: npm run build
