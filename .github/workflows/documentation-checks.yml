@@ -1,0 +1,40 @@
+name: Documentation structure
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  required-docs:
+    name: Check required documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Verify baseline PDFs and evidence indexes
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            "SRS.pdf" \
+            "Software Architecture & Design Specification.pdf" \
+            "Test Plan.pdf" \
+            "1-SRS-and-WBS/README.md" \
+            "1-SRS-and-WBS/work-breakdown.md" \
+            "2-Test-Planning/README.md" \
+            "3-Requirements-Engineering/README.md" \
+            "3-Requirements-Engineering/RTM.md" \
+            "4-Architecture-and-Design/README.md" \
+            "5-Project-and-Sprint-Evidence/README.md" \
+            "6-Copilot-Evidence/README.md" \
+            "7-Testing-Tools-and-Fixes/README.md" \
+            "8-Deployment-and-Environment/README.md" \
+            "9-Demo/README.md"; do
+            test -s "$file" || { echo "Missing required file: $file"; exit 1; }
+          done
+          echo "Required baseline PDFs and documentation indexes are present."
