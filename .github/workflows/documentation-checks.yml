@@ -12,10 +12,10 @@ permissions:
 jobs:
   required-docs:
     name: Check required documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Verify baseline PDFs and evidence indexes
         shell: bash
         run: |
