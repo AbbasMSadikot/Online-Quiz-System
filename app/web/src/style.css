@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+:root { font-family: "DM Sans", sans-serif; color: #202743; background: #f4f6fb; font-synthesis: none; text-rendering: optimizeLegibility; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(ellipse at 12% 12%, #e5eafe 0, transparent 37%), #f5f6fb; }
+button, input { font: inherit; }
+.page-shell { width: min(1120px, calc(100% - 56px)); min-height: 100vh; margin: 0 auto; display: flex; flex-direction: column; }
+.brand { display: flex; align-items: center; gap: 11px; padding: 30px 0; color: #222943; font: 800 20px Manrope, sans-serif; letter-spacing: -.7px; }
+.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; color: white; background: #5867dc; font: 800 18px Manrope, sans-serif; box-shadow: 0 7px 16px #5867dc44; }
+.brand-light { color: #727b91; font-weight: 500; }
+.auth-layout { flex: 1; display: grid; grid-template-columns: 1fr 440px; gap: 90px; align-items: center; padding: 15px 6.5% 55px; }
+.eyebrow { color: #6873d7; font-size: 11px; letter-spacing: 1.8px; font-weight: 700; }
+.intro h1 { margin: 18px 0; font: 800 clamp(38px, 5vw, 58px)/1.12 Manrope, sans-serif; letter-spacing: -2.5px; color: #222943; }
+.intro h1 span { color: #6673db; }
+.intro-copy { max-width: 360px; color: #7c8499; font-size: 15px; line-height: 1.7; }
+.decorative-card { position: relative; margin-top: 48px; max-width: 420px; padding: 24px 25px 22px; border: 1px solid #e8eafa; border-radius: 16px; background: #fff; box-shadow: 0 16px 45px #323e7110; }
+.mini-top { display: flex; gap: 5px; align-items: center; margin-bottom: 23px; }
+.mini-dot { width: 6px; height: 6px; border-radius: 50%; background: #c7cbed; }
+.mini-dot:first-child { background: #6874dd; }
+.mini-label { margin-left: 9px; color: #9299aa; font-size: 9px; letter-spacing: 1.4px; }
+.progress-title { font: 700 17px Manrope, sans-serif; }
+.progress-track { height: 7px; margin: 15px 0 9px; border-radius: 5px; background: #edf0fa; }
+.progress-track span { display: block; width: 67%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6874dd, #9da5ef); }
+.progress-meta { display: flex; justify-content: space-between; color: #9299aa; font-size: 10px; }
+.progress-meta span:last-child { color: #f4b759; letter-spacing: 2px; }
+.form-panel { padding: 37px 36px 33px; border: 1px solid #eaecf4; border-radius: 18px; background: #fff; box-shadow: 0 20px 65px #28335712; }
+.form-heading h2, .success-panel h2 { margin: 0; color: #222943; font: 700 25px Manrope, sans-serif; letter-spacing: -.7px; }
+.form-heading p, .support-copy { margin: 9px 0 24px; color: #858ca0; font-size: 13px; }
+.mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 0 23px; padding: 4px; border-radius: 9px; background: #f4f5fa; }
+.mode-switch button { border: 0; border-radius: 7px; padding: 10px; background: transparent; color: #858ca0; cursor: pointer; font-size: 12px; font-weight: 600; }
+.mode-switch button.active { background: white; color: #4e5bc8; box-shadow: 0 2px 6px #27305e14; }
+form label, .password-label label { display: block; color: #343b56; font-size: 12px; font-weight: 600; }
+form input { width: 100%; height: 45px; margin: 8px 0 18px; padding: 0 13px; outline: none; border: 1px solid #e4e7f0; border-radius: 8px; color: #303752; background: #fff; font-size: 13px; transition: border .16s, box-shadow .16s; }
+form input::placeholder { color: #b2b7c5; }
+form input:focus { border-color: #7783e3; box-shadow: 0 0 0 3px #7783e321; }
+.password-label { display: flex; align-items: center; justify-content: space-between; }
+.password-label span { color: #a0a6b6; font-size: 10px; }
+.button { width: 100%; min-height: 46px; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 4px; border: none; border-radius: 8px; color: white; background: #5c6bda; cursor: pointer; font-weight: 600; font-size: 13px; box-shadow: 0 7px 15px #5c6bda2b; transition: background .15s, transform .15s; }
+.button:hover { background: #4c5ac8; transform: translateY(-1px); }
+.button:disabled { cursor: wait; opacity: .7; transform: none; }
+.button.secondary { margin-top: 23px; color: #505dc6; border: 1px solid #e2e5f4; background: #f6f7fc; box-shadow: none; }
+.notice { margin: -2px 0 14px; padding: 10px 12px; border-radius: 7px; color: #9c4b41; background: #fff2ef; font-size: 12px; line-height: 1.5; }
+.notice.success { color: #36775c; background: #eff9f2; }
+.terms { margin: 17px 0 0; color: #a2a8b7; text-align: center; font-size: 10px; }
+.success-panel { text-align: center; }
+.success-icon { width: 42px; height: 42px; display: grid; place-items: center; margin: 0 auto 20px; border-radius: 50%; color: #fff; background: #52b88a; font-size: 20px; }
+.success-panel .support-copy { margin: 10px 0 23px; line-height: 1.7; }
+.account-chip { display: flex; align-items: center; gap: 12px; padding: 13px; border: 1px solid #edf0f5; border-radius: 10px; background: #fafbfe; text-align: left; }
+.avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #4d5bc2; background: #e9ebff; font-weight: 700; }
+.account-chip strong, .account-chip small { display: block; }
+.account-chip strong { color: #434b66; font-size: 11px; }
+.account-chip small { margin-top: 3px; color: #9399a9; font-size: 10px; }
+footer { display: flex; justify-content: space-between; padding: 18px 0 24px; color: #a0a6b4; font-size: 10px; }
+@media (max-width: 850px) { .auth-layout { grid-template-columns: 1fr 390px; gap: 36px; padding-inline: 2%; } }
+@media (max-width: 680px) { .page-shell { width: min(470px, calc(100% - 32px)); } .brand { padding: 22px 0; } .auth-layout { display: flex; flex-direction: column; align-items: stretch; gap: 28px; padding: 30px 0 38px; } .intro h1 { font-size: 40px; } .intro-copy { max-width: 320px; } .decorative-card { display: none; } .form-panel { padding: 30px 24px; } footer { gap: 15px; font-size: 9px; } }
