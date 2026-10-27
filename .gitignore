@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+!app/api/.env.test
+app/api/prisma/*.db
+app/api/prisma/*.db-journal
+app/api/coverage/
+app/web/dist/
+.DS_Store
