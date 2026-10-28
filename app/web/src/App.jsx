@@ -16,7 +16,7 @@ export default function App() {
     setMessage("");
     setBusy(true);
     try {
-      const response = await fetch(\`/api/auth/\${mode}\`, {
+      const response = await fetch(`/api/auth/${mode}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -42,7 +42,7 @@ export default function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: \`Bearer \${session.token}\`
+          Authorization: `Bearer ${session.token}`
         },
         body: JSON.stringify({
           title: quiz.title,
@@ -57,7 +57,7 @@ export default function App() {
       const body = await response.json();
       if (!response.ok) throw new Error(body.error?.message ?? "Could not create quiz.");
       setQuiz({ title: "", instructions: "", questions: [emptyQuestion()] });
-      setMessage(\`“\${body.data.quiz.title}” was created with \${body.data.quiz.questions.length} question(s).\`);
+      setMessage(`“${body.data.quiz.title}” was created with ${body.data.quiz.questions.length} question(s).`);
     } catch (error) {
       setMessage(error.message || "Could not reach the server. Check that the API is running.");
     } finally {
@@ -120,12 +120,12 @@ export default function App() {
                     {quiz.questions.map((question, index) => (
                       <fieldset className="question-editor" key={index}>
                         <legend>Question {index + 1}</legend>
-                        <label htmlFor={\`question-\${index}\`}>Question</label>
-                        <input id={\`question-\${index}\`} required maxLength={500} value={question.prompt} onChange={event => updateQuestion(index, "prompt", event.target.value)} placeholder="Write the question" />
-                        <label htmlFor={\`options-\${index}\`}>Answer options <span className="field-hint">One option per line</span></label>
-                        <textarea id={\`options-\${index}\`} required rows={4} value={question.options} onChange={event => updateQuestion(index, "options", event.target.value)} placeholder={"First option\nSecond option"} />
-                        <label htmlFor={\`answer-\${index}\`}>Correct answer</label>
-                        <input id={\`answer-\${index}\`} required maxLength={200} value={question.correctAnswer} onChange={event => updateQuestion(index, "correctAnswer", event.target.value)} placeholder="Enter one option exactly" />
+                        <label htmlFor={`question-${index}`}>Question</label>
+                        <input id={`question-${index}`} required maxLength={500} value={question.prompt} onChange={event => updateQuestion(index, "prompt", event.target.value)} placeholder="Write the question" />
+                        <label htmlFor={`options-${index}`}>Answer options <span className="field-hint">One option per line</span></label>
+                        <textarea id={`options-${index}`} required rows={4} value={question.options} onChange={event => updateQuestion(index, "options", event.target.value)} placeholder={"First option\nSecond option"} />
+                        <label htmlFor={`answer-${index}`}>Correct answer</label>
+                        <input id={`answer-${index}`} required maxLength={200} value={question.correctAnswer} onChange={event => updateQuestion(index, "correctAnswer", event.target.value)} placeholder="Enter one option exactly" />
                         {quiz.questions.length > 1 && <button type="button" className="text-button remove-question" onClick={() => setQuiz(current => ({ ...current, questions: current.questions.filter((_, i) => i !== index) }))}>Remove question</button>}
                       </fieldset>
                     ))}
