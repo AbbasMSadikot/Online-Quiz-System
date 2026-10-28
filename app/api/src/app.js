@@ -3,6 +3,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { prisma } from "./db.js";
 import { createAuthRouter, createRequireAuth } from "./auth.js";
+import { createQuizRouter } from "./quizzes.js";
 
 export function createApp({
   prismaClient = prisma,
@@ -23,6 +24,7 @@ export function createApp({
     legacyHeaders: false
   }));
   app.use("/api/auth", createAuthRouter({ prisma: prismaClient, jwtSecret }));
+  app.use("/api/quizzes", createQuizRouter({ prisma: prismaClient, jwtSecret }));
 
   app.get("/api/auth/me", createRequireAuth(jwtSecret), async (req, res, next) => {
     try {
