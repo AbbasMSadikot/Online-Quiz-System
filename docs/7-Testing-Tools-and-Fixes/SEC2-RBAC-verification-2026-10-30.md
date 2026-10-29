@@ -12,4 +12,4 @@ The API protects quiz-management operations with JWT authentication and checks f
 
 The existing collaborator change in [PR #20](https://github.com/AbbasMSadikot/Online-Quiz-System/pull/20) added the quiz-management role checks and student-denial tests. The administrator allow-case is covered by the additional test added for issue #6.
 
-The test suite runs in the **Application checks** GitHub Actions workflow on pushes to main. Record the successful run after it completes before treating this report as verified.
+The test suite passed in the **Application checks** GitHub Actions workflow on main: [run #40957301803](https://github.com/AbbasMSadikot/Online-Quiz-System/actions/runs/40957301803). The documentation structure check also passed in [run #40957301786](https://github.com/AbbasMSadikot/Online-Quiz-System/actions/runs/40957301786).

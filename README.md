@@ -24,7 +24,7 @@ A mini project for an online quiz system. The submitted Software Requirements Sp
 
 FR1 provides account registration and login using an email and password. The API normalizes email addresses, validates required fields, stores passwords as salted bcrypt hashes, and issues short-lived signed JWTs. The frontend keeps the token in memory for the current signed-in session. A protected `GET /api/auth/me` endpoint verifies the bearer token.
 
-The initial implementation uses SQLite through Prisma for simple local setup. The SAD requires a relational database; SQLite satisfies that requirement for this mini-project. The schema can be moved to a hosted relational database if deployment needs it.
+The initial implementation uses SQLite through Prisma for local setup. SQLite meets the SAD's relational-database requirement; the Test Plan names PostgreSQL, so this difference and its disposition are recorded in [the deviation log](docs/3-Requirements-Engineering/deviation-log.md).
 
 ## FR2 implementation
 
@@ -83,4 +83,4 @@ The nine evidence folders map to the submission checklist:
 8. [Deployment and Environment](docs/8-Deployment-and-Environment/)
 9. [Demo](docs/9-Demo/)
 
-Current code implements FR1 and FR2. Quiz taking (FR3), automated grading (FR4), and Sprint 2 non-functional requirements are tracked for upcoming sprints.
+Current code implements FR1 and FR2. FR3/FR4 and several Sprint 2 verification and demo items remain open. See the RTM and Sprint 2 exit review for the recorded status and carry-forward disposition.

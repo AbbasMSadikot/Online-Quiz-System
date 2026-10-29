@@ -24,11 +24,11 @@ The Sprint 2 evidence snapshot is recorded on 30 October 2026. The source PDFs a
 | #11 NFR2 500 concurrent users | Harshith-Kumar-77 | Open | Carry forward; no load-test report found |
 | #13 Sprint 2 demo video | adityamandir2005-pixel | Open | Carry forward; no video is in `docs/9-Demo/` |
 | #14 product/verification documentation | hemant-1215 | Open | Carry forward; final verification and deployment evidence remain |
-| #15 deviation record | AbbasMSadikot | In progress | This review creates the deviation log; keep open until the owner confirms disposition |
+| #15 deviation record | AbbasMSadikot | Complete | Deviation log records the Test Plan database mismatch and documented disposition; issue closed |
 | #16 freeze development cycle | AbbasMSadikot | In progress | Record the final freeze only after open-item disposition and required demo/documentation decisions |
 
 Sprint 1 issue #12 (one-minute demo) is also open and assigned to AbbasMSadikot; it is not misrepresented as a Sprint 2 deliverable.
 
 ## Freeze status
 
-**No final development freeze is declared by this review.** Several required product, performance, deployment, demo, and verification items remain open. The owner can record a final freeze after deciding whether those items are completed or formally deferred.
+**Sprint 2 is not complete and no final development freeze is declared.** FR3/FR4, SEC3, NFR1-NFR3 evidence, the Sprint 2 demo, and final verification documentation are still open. Their existing owners must complete them or the owner must formally defer them before a freeze. The NFR1 assessment is blocked until the grading endpoint exists.
