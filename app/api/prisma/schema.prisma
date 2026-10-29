@@ -13,4 +13,27 @@ model User {
   passwordHash String
   role         String   @default("student")
   createdAt    DateTime @default(now())
+  quizzes      Quiz[]
+}
+
+model Quiz {
+  id           Int        @id @default(autoincrement())
+  title        String
+  instructions String
+  ownerId      Int
+  createdAt    DateTime   @default(now())
+  owner        User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  questions    Question[]
+}
+
+model Question {
+  id             Int      @id @default(autoincrement())
+  quizId         Int
+  position       Int
+  prompt         String
+  optionsJson    String
+  correctAnswer  String
+  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, position])
 }

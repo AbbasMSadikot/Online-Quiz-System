@@ -53,3 +53,34 @@ form input:focus { border-color: #7783e3; box-shadow: 0 0 0 3px #7783e321; }
 footer { display: flex; justify-content: space-between; padding: 18px 0 24px; color: #a0a6b4; font-size: 10px; }
 @media (max-width: 850px) { .auth-layout { grid-template-columns: 1fr 390px; gap: 36px; padding-inline: 2%; } }
 @media (max-width: 680px) { .page-shell { width: min(470px, calc(100% - 32px)); } .brand { padding: 22px 0; } .auth-layout { display: flex; flex-direction: column; align-items: stretch; gap: 28px; padding: 30px 0 38px; } .intro h1 { font-size: 40px; } .intro-copy { max-width: 320px; } .decorative-card { display: none; } .form-panel { padding: 30px 24px; } footer { gap: 15px; font-size: 9px; } }
+
+textarea { width: 100%; margin: 8px 0 18px; padding: 11px 13px; resize: vertical; outline: none; border: 1px solid #e4e7f0; border-radius: 8px; color: #303752; background: #fff; font: inherit; font-size: 13px; line-height: 1.5; }
+textarea:focus { border-color: #7783e3; box-shadow: 0 0 0 3px #7783e321; }
+.teacher-panel { align-self: start; margin: 25px 0; }
+.signed-in-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.signed-in-heading .eyebrow { margin-top: 0; }
+.signed-in-heading h2 { margin: 0; color: #222943; font: 700 24px Manrope, sans-serif; letter-spacing: -.7px; }
+.text-button { padding: 5px 0; border: 0; color: #5966cf; background: transparent; cursor: pointer; font-size: 12px; font-weight: 600; }
+.text-button:hover { text-decoration: underline; }
+.workspace-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.workspace-header .support-copy { margin: 0; }
+.new-quiz-button { font-size: 12px; color: #4e5bc8; background: #eef1fc; padding: 6px 12px; border-radius: 6px; }
+.new-quiz-button:hover { background: #e2e7f9; text-decoration: none; }
+.quiz-form { margin-top: 14px; }
+.quiz-form > label, .question-editor label { display: block; color: #343b56; font-size: 12px; font-weight: 600; }
+.question-editor { min-width: 0; margin: 18px 0; padding: 16px; border: 1px solid #eaecf4; border-radius: 10px; }
+.question-editor legend { padding: 0 6px; color: #505dc6; font-size: 12px; font-weight: 700; }
+.question-editor input, .question-editor textarea { margin-bottom: 13px; }
+.field-hint { color: #a0a6b6; font-size: 10px; font-weight: 400; }
+.add-question { width: 100%; margin: 0 0 16px; padding: 11px; border: 1px dashed #b9c0eb; border-radius: 8px; color: #505dc6; background: #fafaff; cursor: pointer; font-weight: 600; font-size: 12px; }
+.add-question:hover { background: #f0f1ff; }
+.remove-question { display: block; margin-left: auto; color: #9c4b41; }
+.quiz-management { margin-top: 32px; padding-top: 22px; border-top: 1px solid #eaecf4; }
+.quiz-management h3 { margin: 0 0 12px; color: #222943; font: 700 16px Manrope, sans-serif; }
+.quiz-list { display: flex; flex-direction: column; gap: 10px; }
+.quiz-item { padding: 12px 14px; border: 1px solid #eaecf4; border-radius: 8px; background: #fafbfe; }
+.quiz-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+.quiz-item-header strong { color: #303752; font-size: 13px; font-weight: 700; }
+.quiz-item-header span { color: #858ca0; font-size: 11px; }
+.quiz-item-instructions { margin: 5px 0 0; color: #677189; font-size: 12px; line-height: 1.4; }
+@media (max-width: 680px) { .teacher-panel { margin: 0; } }
