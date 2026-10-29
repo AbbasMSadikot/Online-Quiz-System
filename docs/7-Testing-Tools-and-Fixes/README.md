@@ -1,9 +1,8 @@
 # Software Testing Tools, Bug Fixes, and Retests
 
-Record the tools actually used (including any AI/vibe-coding assistant), their versions, the finding, the patch, and the retest. Link reports and pull requests where possible.
+Record the tools actually used, findings, patches, and retests. Do not claim a pass when a prerequisite feature is missing.
 
-| Date | Tool/version | Requirement or defect | Finding | Patch/PR | Retest evidence | Result |
-| --- | --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |  |
+- [SEC2 role-based access verification](SEC2-RBAC-verification-2026-10-30.md)
+- [NFR1 grading performance assessment](NFR1-performance-assessment-2026-10-30.md)
 
-No source code or test reports were present at the audit, so no bug fix or retest is claimed here. Run the submitted Test Plan after code is available and record failures as well as passes.
+Automated API checks and the React production build run in the repository's Application checks workflow. NFR1 remains blocked until FR3 quiz submission and FR4 grading are available.

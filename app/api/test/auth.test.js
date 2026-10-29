@@ -198,3 +198,34 @@ test("requires a valid token for the authenticated account endpoint", async () =
   assert.equal(accepted.status, 200);
   assert.equal(accepted.body.data.user.email, "student@example.com");
 });
+
+
+test("allows both teacher and administrator roles to create and list quizzes", async () => {
+  const passwordHash = await bcrypt.hash("correct horse battery", 12);
+
+  for (const role of ["teacher", "admin"]) {
+    const user = await prisma.user.create({
+      data: { email: `${role}@example.com`, passwordHash, role }
+    });
+    const login = await request(app).post("/api/auth/login")
+      .send({ email: user.email, password: "correct horse battery" });
+    assert.equal(login.status, 200);
+    const token = login.body.data.token;
+
+    const created = await request(app)
+      .post("/api/quizzes")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        title: `${role} permission check`,
+        instructions: "Role authorization test.",
+        questions: [{ prompt: "Choose one.", options: ["A", "B"], correctAnswer: "A" }]
+      });
+    assert.equal(created.status, 201, `${role} should be allowed to create quizzes`);
+
+    const listed = await request(app)
+      .get("/api/quizzes")
+      .set("Authorization", `Bearer ${token}`);
+    assert.equal(listed.status, 200, `${role} should be allowed to list quizzes`);
+    assert.ok(listed.body.data.quizzes.some(quiz => quiz.title === `${role} permission check`));
+  }
+});
