@@ -26,6 +26,10 @@ FR1 provides account registration and login using an email and password. The API
 
 The initial implementation uses SQLite through Prisma for simple local setup. The SAD requires a relational database; SQLite satisfies that requirement for this mini-project. The schema can be moved to a hosted relational database if deployment needs it.
 
+## FR2 implementation
+
+FR2 allows authorized teachers and administrators to create quizzes with titles, instructions, and multiple-choice questions. The API exposes `POST /api/quizzes` to persist quizzes and associated questions with role enforcement and input validation, as well as `GET /api/quizzes` to load the teacher's quiz management list. The React web client provides a dedicated teacher workspace to compose quizzes, add/remove multiple-choice questions, specify unique options and correct answers, and view newly created quizzes in the management list.
+
 ## Run locally
 
 Requirements: Node.js 22 or newer and npm.
@@ -39,9 +43,17 @@ Requirements: Node.js 22 or newer and npm.
    npm run db:push --workspace @online-quiz/api
    ```
 
-4. In one terminal, start the API: `npm run dev:api`.
-5. In another terminal, start the web client: `npm run dev:web`.
-6. Open the Vite URL shown in the terminal (normally `http://localhost:5173`).
+4. (Optional) Provision a local teacher account for testing quiz creation:
+
+   ```sh
+   npm run db:seed --workspace @online-quiz/api
+   ```
+
+   Default credentials: `teacher@example.com` / `Teacher123!`.
+
+5. In one terminal, start the API: `npm run dev:api`.
+6. In another terminal, start the web client: `npm run dev:web`.
+7. Open the Vite URL shown in the terminal (normally `http://localhost:5173`).
 
 ## Verification
 
@@ -53,11 +65,11 @@ npm run db:push --workspace @online-quiz/api
 npm test --workspace @online-quiz/api
 ```
 
-The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, and bearer-token authentication. GitHub Actions runs API tests and builds the web client on relevant pull requests.
+The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation with multiple-choice questions, validation rules, teacher quiz listing, and role-based access control (RBAC). GitHub Actions runs API tests and builds the web client on relevant pull requests.
 
 ## Backlog and sprint plan
 
-See GitHub issue [#2 – FR1 User Authentication](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/2) for FR1 acceptance criteria and implementation history. Other assigned Sprint 1 and Sprint 2 items remain tracked in the project board; update status only after their acceptance criteria and evidence are verified.
+See GitHub issues [#2 – FR1 User Authentication](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/2) and [#3 – FR2 Teacher Quiz Creation](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/3) for acceptance criteria and implementation history. Other assigned Sprint 1 and Sprint 2 items remain tracked in the project board; update status only after their acceptance criteria and evidence are verified.
 
 The nine evidence folders map to the submission checklist:
 
@@ -71,4 +83,4 @@ The nine evidence folders map to the submission checklist:
 8. [Deployment and Environment](docs/8-Deployment-and-Environment/)
 9. [Demo](docs/9-Demo/)
 
-Current code implements FR1 only. Quiz creation, quiz taking, grading, and non-functional requirements are not claimed as complete.
+Current code implements FR1 and FR2. Quiz taking (FR3), automated grading (FR4), and Sprint 2 non-functional requirements are tracked for upcoming sprints.

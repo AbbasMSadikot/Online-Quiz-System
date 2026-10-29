@@ -62,6 +62,38 @@ export function createQuizRouter({ prisma, jwtSecret }) {
   const router = Router();
   const requireAuth = createRequireAuth(jwtSecret);
 
+  router.get("/", requireAuth, async (req, res, next) => {
+    if (req.auth.role !== "teacher" && req.auth.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        error: { code: 403, message: "Teacher or administrator privileges are required to view quiz management list." }
+      });
+    }
+
+    try {
+      const quizzes = await prisma.quiz.findMany({
+        where: req.auth.role === "admin" ? {} : { ownerId: req.auth.id },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          title: true,
+          instructions: true,
+          createdAt: true,
+          questions: {
+            select: { id: true, position: true, prompt: true }
+          }
+        }
+      });
+
+      return res.json({
+        success: true,
+        data: { quizzes }
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   router.post("/", requireAuth, async (req, res, next) => {
     if (req.auth.role !== "teacher" && req.auth.role !== "admin") {
       return res.status(403).json({

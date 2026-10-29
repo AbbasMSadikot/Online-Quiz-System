@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const emptyQuestion = () => ({ prompt: "", options: "", correctAnswer: "" });
 
@@ -10,6 +10,33 @@ export default function App() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [quiz, setQuiz] = useState({ title: "", instructions: "", questions: [emptyQuestion()] });
+  const [quizzes, setQuizzes] = useState([]);
+
+  const canCreateQuiz = session && ["teacher", "admin"].includes(session.user.role);
+
+  useEffect(() => {
+    if (session?.token && canCreateQuiz) {
+      loadQuizzes();
+    } else {
+      setQuizzes([]);
+    }
+  }, [session, canCreateQuiz]);
+
+  async function loadQuizzes() {
+    try {
+      const response = await fetch("/api/quizzes", {
+        headers: {
+          Authorization: `Bearer ${session.token}`
+        }
+      });
+      const body = await response.json();
+      if (response.ok && body.success && Array.isArray(body.data?.quizzes)) {
+        setQuizzes(body.data.quizzes);
+      }
+    } catch {
+      // quiet fail
+    }
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -58,11 +85,17 @@ export default function App() {
       if (!response.ok) throw new Error(body.error?.message ?? "Could not create quiz.");
       setQuiz({ title: "", instructions: "", questions: [emptyQuestion()] });
       setMessage(`“${body.data.quiz.title}” was created with ${body.data.quiz.questions.length} question(s).`);
+      loadQuizzes();
     } catch (error) {
       setMessage(error.message || "Could not reach the server. Check that the API is running.");
     } finally {
       setBusy(false);
     }
+  }
+
+  function resetQuizForm() {
+    setQuiz({ title: "", instructions: "", questions: [emptyQuestion()] });
+    setMessage("");
   }
 
   function updateQuestion(index, field, value) {
@@ -75,10 +108,9 @@ export default function App() {
 
   function signOut() {
     setSession(null);
+    setQuizzes([]);
     setMessage("You have signed out.");
   }
-
-  const canCreateQuiz = session && ["teacher", "admin"].includes(session.user.role);
 
   return (
     <main className="page-shell">
@@ -111,7 +143,10 @@ export default function App() {
                 </div>
               ) : (
                 <>
-                  <p className="support-copy">Build a multiple-choice quiz for your students.</p>
+                  <div className="workspace-header">
+                    <p className="support-copy">Build a multiple-choice quiz for your students.</p>
+                    <button type="button" className="text-button new-quiz-button" onClick={resetQuizForm}>+ New Quiz</button>
+                  </div>
                   <form onSubmit={createQuiz} className="quiz-form">
                     <label htmlFor="quiz-title">Quiz title</label>
                     <input id="quiz-title" required maxLength={120} value={quiz.title} onChange={event => setQuiz({ ...quiz, title: event.target.value })} placeholder="e.g. Science basics" />
@@ -131,8 +166,26 @@ export default function App() {
                     ))}
                     <button type="button" className="add-question" onClick={() => setQuiz(current => ({ ...current, questions: [...current.questions, emptyQuestion()] }))}>+ Add question</button>
                     {message && <p className={message.includes("created") ? "notice success" : "notice"} role="status">{message}</p>}
-                    <button className="button" type="submit" disabled={busy}>{busy ? "Saving…" : "Create quiz"}<span aria-hidden="true">→</span></button>
+                    <button className="button" type="submit" disabled={busy}>{busy ? "Saving…" : "Save Quiz"}<span aria-hidden="true">→</span></button>
                   </form>
+                  <section className="quiz-management">
+                    <h3>Teacher's quiz management list</h3>
+                    {quizzes.length === 0 ? (
+                      <p className="field-hint">No quizzes created yet. Use the form above to save your first quiz.</p>
+                    ) : (
+                      <div className="quiz-list">
+                        {quizzes.map(q => (
+                          <div key={q.id} className="quiz-item">
+                            <div className="quiz-item-header">
+                              <strong>{q.title}</strong>
+                              <span>{q.questions?.length ?? 0} question(s)</span>
+                            </div>
+                            <p className="quiz-item-instructions">{q.instructions}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
                 </>
               )}
             </>
