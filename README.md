@@ -10,9 +10,9 @@ A mini project for an online quiz system. The submitted Software Requirements Sp
 
 ## Submitted baseline documents
 
-- [SRS.pdf](SRS.pdf)
-- [Software Architecture & Design Specification.pdf](Software%20Architecture%20%26%20Design%20Specification.pdf)
-- [Test Plan.pdf](Test%20Plan.pdf)
+- [SRS.pdf](docs/1-SRS-and-WBS/SRS.pdf)
+- [Software Architecture & Design Specification.pdf](docs/4-Architecture-and-Design/Software%20Architecture%20%26%20Design%20Specification.pdf)
+- [Test Plan.pdf](docs/2-Test-Planning/Test%20Plan.pdf)
 
 ## Repository layout
 

@@ -21,9 +21,9 @@ jobs:
         run: |
           set -euo pipefail
           for file in \
-            "SRS.pdf" \
-            "Software Architecture & Design Specification.pdf" \
-            "Test Plan.pdf" \
+            "docs/1-SRS-and-WBS/SRS.pdf" \
+            "docs/4-Architecture-and-Design/Software Architecture & Design Specification.pdf" \
+            "docs/2-Test-Planning/Test Plan.pdf" \
             "docs/1-SRS-and-WBS/README.md" \
             "docs/1-SRS-and-WBS/work-breakdown.md" \
             "docs/2-Test-Planning/README.md" \
