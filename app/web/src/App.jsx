@@ -9,6 +9,7 @@ export default function App() {
   const [session, setSession] = useState(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showGuide, setShowGuide] = useState(true);
   const [quiz, setQuiz] = useState({ title: "", instructions: "", questions: [emptyQuestion()] });
   const [quizzes, setQuizzes] = useState([]);
 
@@ -63,6 +64,21 @@ export default function App() {
   async function createQuiz(event) {
     event.preventDefault();
     setMessage("");
+
+    // Usability client validation to assist new teachers
+    for (let i = 0; i < quiz.questions.length; i++) {
+      const q = quiz.questions[i];
+      const parsedOptions = q.options.split("\n").map(opt => opt.trim()).filter(Boolean);
+      if (parsedOptions.length < 2 || parsedOptions.length > 6) {
+        setMessage(`Question ${i + 1} must have between 2 and 6 non-empty options.`);
+        return;
+      }
+      if (!q.correctAnswer.trim() || !parsedOptions.includes(q.correctAnswer.trim())) {
+        setMessage(`Question ${i + 1}: The correct answer must match one of the entered options exactly.`);
+        return;
+      }
+    }
+
     setBusy(true);
     try {
       const response = await fetch("/api/quizzes", {
@@ -77,7 +93,7 @@ export default function App() {
           questions: quiz.questions.map(question => ({
             prompt: question.prompt,
             options: question.options.split("\n").map(option => option.trim()).filter(Boolean),
-            correctAnswer: question.correctAnswer
+            correctAnswer: question.correctAnswer.trim()
           }))
         })
       });
@@ -145,29 +161,79 @@ export default function App() {
                 <>
                   <div className="workspace-header">
                     <p className="support-copy">Build a multiple-choice quiz for your students.</p>
-                    <button type="button" className="text-button new-quiz-button" onClick={resetQuizForm}>+ New Quiz</button>
+                    <div className="header-actions">
+                      <button type="button" className="text-button guide-toggle" onClick={() => setShowGuide(!showGuide)}>
+                        {showGuide ? "Hide Quick Guide" : "Quick Guide (3-min overview)"}
+                      </button>
+                      <button type="button" className="text-button new-quiz-button" onClick={resetQuizForm}>+ New Quiz</button>
+                    </div>
                   </div>
+
+                  {showGuide && (
+                    <aside className="quick-guide-panel" aria-label="Teacher Quick Start Guide">
+                      <div className="guide-title">
+                        <span className="guide-badge">NFR3 Quick Guide</span>
+                        <strong>Teacher Quiz Creation Walkthrough</strong>
+                      </div>
+                      <ol className="guide-steps">
+                        <li><strong>Title & Instructions:</strong> Give your quiz a descriptive title (max 120 chars) and clear directions for your students.</li>
+                        <li><strong>Add Questions:</strong> Enter each prompt and provide 2 to 6 choices, with one option per line.</li>
+                        <li><strong>Designate Correct Answer:</strong> Type one of the options into the Correct Answer field. The validator confirms matching.</li>
+                        <li><strong>Save Quiz:</strong> Click Save Quiz to store your quiz and verify it in your Management List below.</li>
+                      </ol>
+                    </aside>
+                  )}
+
                   <form onSubmit={createQuiz} className="quiz-form">
                     <label htmlFor="quiz-title">Quiz title</label>
                     <input id="quiz-title" required maxLength={120} value={quiz.title} onChange={event => setQuiz({ ...quiz, title: event.target.value })} placeholder="e.g. Science basics" />
                     <label htmlFor="quiz-instructions">Instructions</label>
                     <textarea id="quiz-instructions" required maxLength={2000} rows={3} value={quiz.instructions} onChange={event => setQuiz({ ...quiz, instructions: event.target.value })} placeholder="Tell students how to complete this quiz" />
-                    {quiz.questions.map((question, index) => (
-                      <fieldset className="question-editor" key={index}>
-                        <legend>Question {index + 1}</legend>
-                        <label htmlFor={`question-${index}`}>Question</label>
-                        <input id={`question-${index}`} required maxLength={500} value={question.prompt} onChange={event => updateQuestion(index, "prompt", event.target.value)} placeholder="Write the question" />
-                        <label htmlFor={`options-${index}`}>Answer options <span className="field-hint">One option per line</span></label>
-                        <textarea id={`options-${index}`} required rows={4} value={question.options} onChange={event => updateQuestion(index, "options", event.target.value)} placeholder={"First option\nSecond option"} />
-                        <label htmlFor={`answer-${index}`}>Correct answer</label>
-                        <input id={`answer-${index}`} required maxLength={200} value={question.correctAnswer} onChange={event => updateQuestion(index, "correctAnswer", event.target.value)} placeholder="Enter one option exactly" />
-                        {quiz.questions.length > 1 && <button type="button" className="text-button remove-question" onClick={() => setQuiz(current => ({ ...current, questions: current.questions.filter((_, i) => i !== index) }))}>Remove question</button>}
-                      </fieldset>
-                    ))}
+                    {quiz.questions.map((question, index) => {
+                      const parsedOptions = question.options.split("\n").map(o => o.trim()).filter(Boolean);
+                      const optionCount = parsedOptions.length;
+                      const hasCorrectAnswer = Boolean(question.correctAnswer.trim());
+                      const isMatching = hasCorrectAnswer && parsedOptions.includes(question.correctAnswer.trim());
+
+                      return (
+                        <fieldset className="question-editor" key={index}>
+                          <legend>Question {index + 1}</legend>
+                          <label htmlFor={`question-${index}`}>Question</label>
+                          <input id={`question-${index}`} required maxLength={500} value={question.prompt} onChange={event => updateQuestion(index, "prompt", event.target.value)} placeholder="Write the question" />
+                          
+                          <div className="field-header">
+                            <label htmlFor={`options-${index}`}>Answer options <span className="field-hint">One option per line</span></label>
+                            {optionCount > 0 && (
+                              <span className={optionCount >= 2 && optionCount <= 6 ? "validation-pill success" : "validation-pill warning"}>
+                                {optionCount} / 6 options {optionCount >= 2 && optionCount <= 6 ? "✓" : "(2 to 6 required)"}
+                              </span>
+                            )}
+                          </div>
+                          <textarea id={`options-${index}`} required rows={4} value={question.options} onChange={event => updateQuestion(index, "options", event.target.value)} placeholder={"First option\nSecond option\nThird option"} />
+                          
+                          <div className="field-header">
+                            <label htmlFor={`answer-${index}`}>Correct answer</label>
+                            {hasCorrectAnswer && (
+                              <span className={isMatching ? "validation-pill success" : "validation-pill warning"}>
+                                {isMatching ? "✓ Matches option" : "Must match an option above"}
+                              </span>
+                            )}
+                          </div>
+                          <input id={`answer-${index}`} required maxLength={200} value={question.correctAnswer} onChange={event => updateQuestion(index, "correctAnswer", event.target.value)} placeholder="Enter one option exactly" />
+                          
+                          {quiz.questions.length > 1 && (
+                            <button type="button" className="text-button remove-question" onClick={() => setQuiz(current => ({ ...current, questions: current.questions.filter((_, i) => i !== index) }))}>
+                              Remove question
+                            </button>
+                          )}
+                        </fieldset>
+                      );
+                    })}
                     <button type="button" className="add-question" onClick={() => setQuiz(current => ({ ...current, questions: [...current.questions, emptyQuestion()] }))}>+ Add question</button>
                     {message && <p className={message.includes("created") ? "notice success" : "notice"} role="status">{message}</p>}
                     <button className="button" type="submit" disabled={busy}>{busy ? "Saving…" : "Save Quiz"}<span aria-hidden="true">→</span></button>
                   </form>
+
                   <section className="quiz-management">
                     <h3>Teacher's quiz management list</h3>
                     {quizzes.length === 0 ? (
