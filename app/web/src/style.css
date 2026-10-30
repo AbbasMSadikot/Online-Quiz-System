@@ -62,12 +62,27 @@ textarea:focus { border-color: #7783e3; box-shadow: 0 0 0 3px #7783e321; }
 .signed-in-heading h2 { margin: 0; color: #222943; font: 700 24px Manrope, sans-serif; letter-spacing: -.7px; }
 .text-button { padding: 5px 0; border: 0; color: #5966cf; background: transparent; cursor: pointer; font-size: 12px; font-weight: 600; }
 .text-button:hover { text-decoration: underline; }
-.workspace-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.workspace-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
 .workspace-header .support-copy { margin: 0; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.guide-toggle { font-size: 11px; color: #5867dc; background: #f0f2fd; padding: 5px 10px; border-radius: 6px; }
+.guide-toggle:hover { background: #e5e8fb; text-decoration: none; }
 .new-quiz-button { font-size: 12px; color: #4e5bc8; background: #eef1fc; padding: 6px 12px; border-radius: 6px; }
 .new-quiz-button:hover { background: #e2e7f9; text-decoration: none; }
+
+.quick-guide-panel { margin: 14px 0 18px; padding: 14px 16px; border: 1px solid #dbe1fa; border-radius: 10px; background: #f8faff; }
+.guide-title { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; color: #222943; }
+.guide-badge { font-size: 10px; font-weight: 700; color: #3a48b5; background: #e2e7fc; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.guide-steps { margin: 0; padding-left: 20px; font-size: 12px; color: #495270; line-height: 1.6; }
+.guide-steps li { margin-bottom: 4px; }
+
 .quiz-form { margin-top: 14px; }
 .quiz-form > label, .question-editor label { display: block; color: #343b56; font-size: 12px; font-weight: 600; }
+.field-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+.validation-pill { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+.validation-pill.success { color: #24754f; background: #e6f6ee; }
+.validation-pill.warning { color: #b25e00; background: #fff5e6; }
+
 .question-editor { min-width: 0; margin: 18px 0; padding: 16px; border: 1px solid #eaecf4; border-radius: 10px; }
 .question-editor legend { padding: 0 6px; color: #505dc6; font-size: 12px; font-weight: 700; }
 .question-editor input, .question-editor textarea { margin-bottom: 13px; }

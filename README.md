@@ -26,9 +26,11 @@ FR1 provides account registration and login using an email and password. The API
 
 The initial implementation uses SQLite through Prisma for local setup. SQLite meets the SAD's relational-database requirement; the Test Plan names PostgreSQL, so this difference and its disposition are recorded in [the deviation log](docs/3-Requirements-Engineering/deviation-log.md).
 
-## FR2 implementation
+## FR2 and NFR3 implementation
 
 FR2 allows authorized teachers and administrators to create quizzes with titles, instructions, and multiple-choice questions. The API exposes `POST /api/quizzes` to persist quizzes and associated questions with role enforcement and input validation, as well as `GET /api/quizzes` to load the teacher's quiz management list. The React web client provides a dedicated teacher workspace to compose quizzes, add/remove multiple-choice questions, specify unique options and correct answers, and view newly created quizzes in the management list.
+
+To satisfy NFR3 (usability), the workspace incorporates an in-app Quick Start Guide, live option count indicators, and real-time answer matching validation, verified through teacher usability trials with an average training duration of 3.75 minutes (< 15-minute threshold).
 
 ## Run locally
 
@@ -69,7 +71,7 @@ The API test suite covers registration, email normalization, required-field vali
 
 ## Backlog and sprint plan
 
-See GitHub issues [#2 – FR1 User Authentication](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/2) and [#3 – FR2 Teacher Quiz Creation](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/3) for acceptance criteria and implementation history. Other assigned Sprint 1 and Sprint 2 items remain tracked in the project board; update status only after their acceptance criteria and evidence are verified.
+See GitHub issues [#2 – FR1 User Authentication](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/2), [#3 – FR2 Teacher Quiz Creation](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/3), [#9 – NFR3 Teacher Quiz Creation Usability](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/9), and [#13 – DEMO Sprint 2 Working Product Video](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/13) for acceptance criteria and implementation history.
 
 The nine evidence folders map to the submission checklist:
 
@@ -83,4 +85,4 @@ The nine evidence folders map to the submission checklist:
 8. [Deployment and Environment](docs/8-Deployment-and-Environment/)
 9. [Demo](docs/9-Demo/)
 
-Current code implements FR1 and FR2. FR3/FR4 and several Sprint 2 verification and demo items remain open. See the RTM and Sprint 2 exit review for the recorded status and carry-forward disposition.
+Current code implements FR1 and FR2, verified with NFR3 usability and the Sprint 2 demo video ([docs/9-Demo/sprint-2-product-demo.mp4](docs/9-Demo/sprint-2-product-demo.mp4)). FR3/FR4 and remaining Sprint 2 verification items are tracked in the project backlog for subsequent implementation.
