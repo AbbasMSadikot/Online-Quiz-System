@@ -31,7 +31,7 @@ jobs:
         working-directory: .
       - run: npx prisma generate --schema prisma/schema.prisma
       - run: npx prisma db push --schema prisma/schema.prisma
-      - run: node --test
+      - run: node --test --test-concurrency=1
 
   web:
     runs-on: ubuntu-24.04
