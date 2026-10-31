@@ -4,10 +4,23 @@ Store the actual working-product recordings here, or link to files committed in 
 
 ## Submission checklist
 
-- [ ] Sprint 1 demo: approximately one minute, recorded for Sprint 1 (19–23 Oct 2026) (Assigned to AbbasMSadikot, [Issue #12](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/12))
+- [x] Sprint 1 scope demo: 59.99-second retrospective recording captured 31 October 2026 (Assigned to AbbasMSadikot, [Issue #12](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/12))
 - [x] Sprint 2 demo: approximately two minutes, recorded for Sprint 2 (26–30 Oct 2026) (Assigned to Aditya Mandir, [Issue #13](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/13))
 - [x] Show the implemented user flows and state any known gaps/deviations
 - [x] Confirm each video plays and does not expose credentials or private test data
+
+---
+
+## Sprint 1 Scope Demonstration
+
+- **File:** [sprint-1-product-demo.mov](sprint-1-product-demo.mov)
+- **Duration:** 59.99 seconds
+- **Format:** QuickTime MOV screen recording
+- **Recorded Date:** 31 October 2026 (retrospective demonstration; not recorded during the Sprint 1 dates)
+- **Demonstrated:** Student account registration, successful authenticated session, sign-out, and successful sign-in on the local application.
+- **Test identity:** A synthetic `example.test` student account; no personal credentials are shown.
+
+This recording demonstrates the Sprint 1 authentication scope. It is a retrospective recording and is not represented as footage captured during 19–23 October.
 
 ---
 

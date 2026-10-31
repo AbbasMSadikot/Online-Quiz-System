@@ -1,6 +1,6 @@
 # NFR1 Grading Performance Assessment — 30 Oct 2026
 
-**Status: blocked; no performance pass is claimed.**
+**Historical assessment (30 October 2026): blocked at that time.** The grading route was not yet present. This assessment was superseded after collaborator PR #22 merged; see the [31 October NFR1 performance verification](NFR1-performance-verification-2026-10-31.md).
 
 ## Requirement
 
@@ -8,15 +8,15 @@ The SRS NFR1 and Test Plan TC-06 require a representative quiz submission to be 
 
 ## Finding
 
-The main-branch API currently mounts authentication routes and quiz-management routes. The quiz router implements quiz creation and listing; it does not implement the SAD's `POST /api/quizzes/{id}/submit` endpoint. FR3 student submissions (issue #4) and FR4 automatic grading (issue #5) are still open.
+At the 30 October review, the main-branch API mounted authentication and quiz-management routes but did not implement the SAD's `POST /api/quizzes/{id}/submit` endpoint. Collaborator PR #22 added the grading route on 31 October.
 
-Without a real grading endpoint and a result payload, there is no representative grading request to time. An HTTP response from an unrelated/missing route would not measure grading performance, so no latency numbers are reported.
+Without a real grading endpoint and a result payload, there was no representative grading request to time. An HTTP response from an unrelated/missing route would not measure grading performance, so no latency numbers were reported in this historical assessment.
 
 ## Result and disposition
 
-- **Result:** Not measured; NFR1 is unverified and remains open as issue #8.
-- **Evidence:** main-branch route review of `app/api/src/app.js` and `app/api/src/quizzes.js`; current requirement status is in [the RTM](../3-Requirements-Engineering/RTM.md).
-- **Dependencies:** FR3 issue #4 and FR4 issue #5 must be implemented and merged.
-- **Retest:** After the submission/grading endpoint exists, run authenticated representative submissions against the documented deployment under a recorded normal-load profile; report sample count, concurrency, environment, median, p95, maximum, errors, and whether the 2.0-second criterion passed.
+- **Result on 30 October:** Not measured; NFR1 was unverified and issue #8 remained open.
+- **Evidence at that time:** route review of `app/api/src/app.js` and `app/api/src/quizzes.js`; PR #22 subsequently added the grading route.
+- **Dependencies at that time:** an API submission path was required before a representative grading request could be timed.
+- **Retest:** Completed on 31 October; see [the NFR1 performance verification](NFR1-performance-verification-2026-10-31.md) for the repeatable local profile, measurements, and limits.
 
 This assessment records a blocker; it does not satisfy the performance acceptance criterion.

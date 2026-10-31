@@ -6,10 +6,10 @@ Draft checklist based on the repository backlog and the submission brief. Confir
 | --- | --- | --- | --- |
 | 1 | Review FR, NFR, constraints, and acceptance criteria | [SRS.pdf](SRS.pdf); issue #2–#11 | Reviewed; see RTM and issue statuses |
 | 2 | Refine architecture, components, APIs, and interaction flows | [SAD PDF](../4-Architecture-and-Design/Software%20Architecture%20%26%20Design%20Specification.pdf); folder 4 diagrams | Baseline present; diagram evidence still missing |
-| 3 | Implement and review prioritized product stories | Issues #2–#11; reviewed PRs | FR1 and FR2 implemented on main; FR3/FR4 remain open |
-| 4 | Execute test plan, capture defects, patches, and retests | [Test Plan.pdf](../2-Test-Planning/Test%20Plan.pdf); folder 7 | API test suite, SEC2, and NFR3 usability evidence present; NFR1/NFR2 evidence remains |
-| 5 | Prepare environment and deployment instructions | folder 8 | Local setup documented; production deployment and TLS remain open |
-| 6 | Record Sprint 1 and Sprint 2 working-product demos | Issues #12–#13; folder 9 | Sprint 2 demo (2 min) present in folder 9; Sprint 1 demo (#12) remains open |
-| 7 | Complete traceability and deviation records; freeze release | Issues #14–#16 | RTM/deviation log present; final docs and freeze remain open |
+| 3 | Implement and review prioritized product stories | Issues #2–#11; reviewed PRs | FR1, FR2 and FR4 are on main; FR3 remains open with its assignee |
+| 4 | Execute test plan, capture defects, patches, and retests | [Test Plan.pdf](../2-Test-Planning/Test%20Plan.pdf); folder 7 | 12 API tests pass; SEC2, NFR1 single-client timing, and NFR3 usability evidence present; NFR2 load test remains open |
+| 5 | Prepare environment and deployment instructions | folder 8 | Local setup and HTTPS server support documented; deployed HTTPS verification remains open |
+| 6 | Record Sprint 1 and Sprint 2 working-product demos | Issues #12–#13; folder 9 | Sprint 1 scope demo (59.99 sec, retrospective) and collaborator Sprint 2 demo (2 min) are indexed in folder 9 |
+| 7 | Complete traceability and deviation records; freeze release | Issues #14–#16 | RTM, deviation log and 31 Oct submission freeze record are present; team issue #14 remains assigned and open |
 
-Update owners, dependencies, and status from the team’s actual work. This draft does not certify completion.
+This status snapshot is for 31 October 2026. It does not certify full SRS compliance; read the freeze record for deferred items and limits.

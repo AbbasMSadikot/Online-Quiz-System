@@ -32,6 +32,12 @@ FR2 allows authorized teachers and administrators to create quizzes with titles,
 
 To satisfy NFR3 (usability), the workspace incorporates an in-app Quick Start Guide, live option count indicators, and real-time answer matching validation, verified through teacher usability trials with an average training duration of 3.75 minutes (< 15-minute threshold).
 
+## FR4 automatic grading and NFR1 performance
+
+The authenticated student endpoint `POST /api/quizzes/{quizId}/submit` accepts one answer for every quiz question and returns the correct count, total, and percentage without exposing the answer key. Automated tests cover full, zero, partial, malformed, unauthenticated, and non-student submissions.
+
+The repeatable local NFR1 probe runs five warm-up requests followed by 100 sequential submissions against a ten-question quiz. Two runs on 31 October 2026 in the local Apple Silicon/macOS 26.6.2 environment with Node.js 26.5.0 measured p95 0.69–0.84 ms and maximum 0.88–1.08 ms, below the 2,000 ms threshold. This is a single-client local measurement; it is not a production-network or 500-concurrent-user result. See [the NFR1 verification record](docs/7-Testing-Tools-and-Fixes/NFR1-performance-verification-2026-10-31.md).
+
 ## Run locally
 
 Requirements: Node.js 22 or newer and npm.
@@ -65,9 +71,10 @@ From the repository root, run `npm run build` for the web production build. For 
 npm run db:generate --workspace @online-quiz/api
 npm run db:push --workspace @online-quiz/api
 npm test --workspace @online-quiz/api
+npm run benchmark:grading --workspace @online-quiz/api
 ```
 
-The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation with multiple-choice questions, validation rules, teacher quiz listing, and role-based access control (RBAC). GitHub Actions runs API tests and builds the web client on relevant pull requests.
+The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation, grading, validation rules, and role-based access control (RBAC). GitHub Actions runs API tests, the repeatable grading benchmark, and the web build on relevant pull requests.
 
 ## Backlog and sprint plan
 
@@ -85,4 +92,4 @@ The nine evidence folders map to the submission checklist:
 8. [Deployment and Environment](docs/8-Deployment-and-Environment/)
 9. [Demo](docs/9-Demo/)
 
-Current code implements FR1 and FR2, verified with NFR3 usability and the Sprint 2 demo video ([docs/9-Demo/sprint-2-product-demo.mp4](docs/9-Demo/sprint-2-product-demo.mp4)). FR3/FR4 and remaining Sprint 2 verification items are tracked in the project backlog for subsequent implementation.
+Current code implements FR1, FR2, and FR4. Student quiz selection and time-limit enforcement (FR3), a deployed HTTPS endpoint, and the 500-concurrent-user NFR2 load test remain open in the assigned backlog. The repository includes the [Sprint 1 scope demo](docs/9-Demo/sprint-1-product-demo.mov) and the collaborator-recorded [Sprint 2 product demo](docs/9-Demo/sprint-2-product-demo.mp4).

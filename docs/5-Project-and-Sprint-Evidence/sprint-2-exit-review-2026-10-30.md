@@ -1,5 +1,7 @@
 # Sprint 2 Exit Review and Freeze Record — 30 Oct 2026
 
+> Historical snapshot as of 30 October. A post-merge performance retest, Sprint 1 retrospective demo, and final freeze disposition are recorded in [the 31 October submission freeze](sprint-2-freeze-2026-10-31.md).
+
 ## Decision
 
 The Sprint 2 evidence snapshot is recorded on 30 October 2026. The source PDFs are unchanged. This is **not a claim that the full product or all Sprint 2 acceptance criteria passed**. Open items below remain visible and are carried forward; the release must not be demonstrated as fully compliant with the SRS.

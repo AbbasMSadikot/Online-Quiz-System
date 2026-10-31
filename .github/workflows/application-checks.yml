@@ -32,6 +32,7 @@ jobs:
       - run: npx prisma generate --schema prisma/schema.prisma
       - run: npx prisma db push --schema prisma/schema.prisma
       - run: node --test --test-concurrency=1
+      - run: npm run benchmark:grading
 
   web:
     runs-on: ubuntu-24.04

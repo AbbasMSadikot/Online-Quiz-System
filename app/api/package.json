@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "dev": "node --env-file=.env --watch src/server.js",
+    "start": "node --env-file=.env src/server.js",
     "db:generate": "prisma generate --schema prisma/schema.prisma",
     "db:push": "prisma db push --schema prisma/schema.prisma",
     "db:seed": "node src/seed.js",
     "verify:tls": "node scripts/verify-tls.mjs",
+    "benchmark:grading": "node --env-file=.env.test scripts/benchmark-grading.mjs",
     "test": "node --env-file=.env.test --test --test-concurrency=1"
   },
   "dependencies": {
