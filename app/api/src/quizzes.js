@@ -62,6 +62,60 @@ export function createQuizRouter({ prisma, jwtSecret }) {
   const router = Router();
   const requireAuth = createRequireAuth(jwtSecret);
 
+  router.post("/:quizId/submit", requireAuth, async (req, res, next) => {
+    if (req.auth.role !== "student") {
+      return res.status(403).json({
+        success: false,
+        error: { code: 403, message: "Only student accounts can submit quiz answers." }
+      });
+    }
+
+    const quizId = Number(req.params.quizId);
+    const answers = req.body?.answers;
+    if (!Number.isInteger(quizId) || quizId < 1 || !Array.isArray(answers)) {
+      return badRequest(res, "A valid quiz ID and an answers array are required.");
+    }
+
+    try {
+      const quiz = await prisma.quiz.findUnique({
+        where: { id: quizId },
+        select: { id: true, questions: { orderBy: { position: "asc" }, select: { id: true, correctAnswer: true } } }
+      });
+      if (!quiz) {
+        return res.status(404).json({ success: false, error: { code: 404, message: "Quiz not found." } });
+      }
+      if (answers.length !== quiz.questions.length) {
+        return badRequest(res, "Submit exactly one answer for each question.");
+      }
+
+      const submittedQuestionIds = new Set();
+      for (const answer of answers) {
+        if (!Number.isInteger(answer?.questionId) || typeof answer.answer !== "string"
+          || submittedQuestionIds.has(answer.questionId)) {
+          return badRequest(res, "Each answer must contain a unique questionId and an answer string.");
+        }
+        submittedQuestionIds.add(answer.questionId);
+      }
+
+      const questionById = new Map(quiz.questions.map(question => [question.id, question]));
+      if (submittedQuestionIds.size !== questionById.size
+        || [...submittedQuestionIds].some(questionId => !questionById.has(questionId))) {
+        return badRequest(res, "Answers must reference every question in this quiz exactly once.");
+      }
+
+      const correct = answers.reduce((score, answer) => (
+        score + (answer.answer.trim() === questionById.get(answer.questionId).correctAnswer ? 1 : 0)
+      ), 0);
+      const total = quiz.questions.length;
+      return res.json({
+        success: true,
+        data: { result: { quizId: quiz.id, correct, total, percentage: Math.round((correct / total) * 100) } }
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   router.get("/", requireAuth, async (req, res, next) => {
     if (req.auth.role !== "teacher" && req.auth.role !== "admin") {
       return res.status(403).json({
