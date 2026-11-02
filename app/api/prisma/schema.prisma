@@ -14,16 +14,20 @@ model User {
   role         String   @default("student")
   createdAt    DateTime @default(now())
   quizzes      Quiz[]
+  attempts     QuizAttempt[]
 }
 
 model Quiz {
   id           Int        @id @default(autoincrement())
   title        String
   instructions String
+  durationMinutes Int     @default(10)
+  isActive     Boolean    @default(true)
   ownerId      Int
   createdAt    DateTime   @default(now())
   owner        User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   questions    Question[]
+  attempts     QuizAttempt[]
 }
 
 model Question {
@@ -36,4 +40,21 @@ model Question {
   quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@unique([quizId, position])
+}
+
+model QuizAttempt {
+  id            Int      @id @default(autoincrement())
+  quizId        Int
+  studentId     Int
+  startedAt     DateTime @default(now())
+  expiresAt     DateTime
+  submittedAt   DateTime?
+  answersJson   String?
+  correct       Int?
+  total         Int
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student       User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([quizId, studentId])
+  @@index([expiresAt])
 }

@@ -58,10 +58,14 @@ try {
   );
   const app = createApp({ prismaClient: prisma, jwtSecret: secret });
   const answers = quiz.questions.map(question => ({ questionId: question.id, answer: "A" }));
-  const submit = () => request(app)
-    .post(`/api/quizzes/${quiz.id}/submit`)
-    .set("Authorization", `Bearer ${token}`)
-    .send({ answers });
+  const submit = async () => {
+    const started = await request(app).post(`/api/quizzes/${quiz.id}/start`).set("Authorization", `Bearer ${token}`);
+    if (started.status !== 201) throw new Error(`Could not start benchmark attempt (HTTP ${started.status}).`);
+    return request(app)
+      .post(`/api/quizzes/${quiz.id}/submit`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ attemptId: started.body.data.attempt.id, answers });
+  };
 
   for (let index = 0; index < warmupCount; index += 1) {
     const response = await submit();

@@ -98,4 +98,13 @@ textarea:focus { border-color: #7783e3; box-shadow: 0 0 0 3px #7783e321; }
 .quiz-item-header strong { color: #303752; font-size: 13px; font-weight: 700; }
 .quiz-item-header span { color: #858ca0; font-size: 11px; }
 .quiz-item-instructions { margin: 5px 0 0; color: #677189; font-size: 12px; line-height: 1.4; }
+.quiz-taking, .result-card { margin-top: 24px; text-align: left; }
+.quiz-taking .quiz-item-header h3, .result-card h3 { margin: 0; color: #222943; font: 700 16px Manrope, sans-serif; }
+.timer { flex-shrink: 0; color: #3b765e; font-size: 12px; font-variant-numeric: tabular-nums; }
+.timer.warning { color: #b3493d; }
+.answer-choice { display: flex !important; align-items: center; gap: 10px; margin: 8px 0; padding: 9px 10px; border: 1px solid #eaecf4; border-radius: 7px; background: #fff; cursor: pointer; }
+.answer-choice input { width: 16px; height: 16px; margin: 0; accent-color: #5c6bda; }
+.answer-choice span { color: #454d68; font-size: 12px; font-weight: 500; }
+.result-card { padding: 18px; border: 1px solid #dbeee4; border-radius: 10px; background: #f4fbf7; text-align: center; }
+.result-card p { color: #36775c; font-size: 16px; }
 @media (max-width: 680px) { .teacher-panel { margin: 0; } }

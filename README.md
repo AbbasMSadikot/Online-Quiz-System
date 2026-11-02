@@ -34,9 +34,13 @@ To satisfy NFR3 (usability), the workspace incorporates an in-app Quick Start Gu
 
 ## FR4 automatic grading and NFR1 performance
 
-The authenticated student endpoint `POST /api/quizzes/{quizId}/submit` accepts one answer for every quiz question and returns the correct count, total, and percentage without exposing the answer key. Automated tests cover full, zero, partial, malformed, unauthenticated, and non-student submissions.
+Students can browse quizzes teachers have made active, start an attempt, and answer the displayed multiple-choice questions. Teachers can hide and republish quizzes and set a whole-number time limit from 1 to 180 minutes (10 minutes by default). The API stores each attempt and its deadline, rejects late or duplicate submissions, and returns a score without exposing the answer key. Automated tests cover the student list, answer-key privacy, timing, availability, and invalid submissions.
 
-The repeatable local NFR1 probe runs five warm-up requests followed by 100 sequential submissions against a ten-question quiz. Two runs on 31 October 2026 in the local Apple Silicon/macOS 26.6.2 environment with Node.js 26.5.0 measured p95 0.69–0.84 ms and maximum 0.88–1.08 ms, below the 2,000 ms threshold. This is a single-client local measurement; it is not a production-network or 500-concurrent-user result. See [the NFR1 verification record](docs/7-Testing-Tools-and-Fixes/NFR1-performance-verification-2026-10-31.md).
+The authenticated student endpoint `POST /api/quizzes/{quizId}/submit` accepts an `attemptId` and one answer for every quiz question. The deadline is calculated and enforced by the server; the browser countdown is only a display aid.
+
+The repeatable local NFR1 probe runs five warm-up workflows followed by 100 sequential timed quiz starts and submissions against a ten-question quiz. On 2 November 2026, p95 was 2.12 ms and maximum 2.25 ms, below the 2,000 ms threshold. This is a single-client local measurement; see the verification details and 500-client local exercise in [the FR3/NFR2 verification record](docs/7-Testing-Tools-and-Fixes/FR3-and-NFR2-verification-2026-11-02.md).
+
+For a controlled local NFR2 exercise, run `npm run load-test:500 --workspace @online-quiz/api`. This creates synthetic local-only student accounts, starts up to 500 simultaneous quiz attempts, submits them concurrently, prints phase throughput/latency/errors, and removes its fixture data. Set `NFR2_CONCURRENCY` to a lower value for a smaller run. This harness does not test a deployed or multi-instance environment; record the environment and any failures before claiming the 500-user requirement is met.
 
 ## Run locally
 
@@ -72,6 +76,8 @@ npm run db:generate --workspace @online-quiz/api
 npm run db:push --workspace @online-quiz/api
 npm test --workspace @online-quiz/api
 npm run benchmark:grading --workspace @online-quiz/api
+# Optional controlled load test; creates synthetic records in the configured local test database
+NFR2_CONCURRENCY=500 npm run load-test:500 --workspace @online-quiz/api
 ```
 
 The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation, grading, validation rules, and role-based access control (RBAC). GitHub Actions runs API tests, the repeatable grading benchmark, and the web build on relevant pull requests.
@@ -92,4 +98,4 @@ The nine evidence folders map to the submission checklist:
 8. [Deployment and Environment](docs/8-Deployment-and-Environment/)
 9. [Demo](docs/9-Demo/)
 
-Current code implements FR1, FR2, and FR4. Student quiz selection and time-limit enforcement (FR3), a deployed HTTPS endpoint, and the 500-concurrent-user NFR2 load test remain open in the assigned backlog. The repository includes the [Sprint 1 scope demo](docs/9-Demo/sprint-1-product-demo.mov) and the collaborator-recorded [Sprint 2 product demo](docs/9-Demo/sprint-2-product-demo.mp4).
+Current code implements FR1, FR2, FR3, and FR4 and includes a repeatable 500-concurrent-student harness for NFR2. The open backlog still tracks review/evidence for assigned items and deployed HTTPS verification; the local load run does not prove capacity in a production environment. The repository includes the [Sprint 1 scope demo](docs/9-Demo/sprint-1-product-demo.mov) and the [Sprint 2 product demo](docs/9-Demo/sprint-2-product-demo.mp4).

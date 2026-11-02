@@ -12,16 +12,36 @@ export default function App() {
   const [showGuide, setShowGuide] = useState(true);
   const [quiz, setQuiz] = useState({ title: "", instructions: "", questions: [emptyQuestion()] });
   const [quizzes, setQuizzes] = useState([]);
+  const [activeAttempt, setActiveAttempt] = useState(null);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [quizResult, setQuizResult] = useState(null);
+  const [secondsLeft, setSecondsLeft] = useState(0);
 
   const canCreateQuiz = session && ["teacher", "admin"].includes(session.user.role);
 
   useEffect(() => {
-    if (session?.token && canCreateQuiz) {
+    if (session?.token) {
       loadQuizzes();
     } else {
       setQuizzes([]);
     }
   }, [session, canCreateQuiz]);
+
+  useEffect(() => {
+    if (!activeAttempt) return undefined;
+    const updateCountdown = () => {
+      const remaining = Math.max(0, Math.ceil((new Date(activeAttempt.expiresAt).getTime() - Date.now()) / 1000));
+      setSecondsLeft(remaining);
+      if (remaining === 0) {
+        setActiveAttempt(null);
+        setSelectedAnswers({});
+        setMessage("Time expired. Late answers are not accepted; start the quiz again when ready.");
+      }
+    };
+    updateCountdown();
+    const timer = window.setInterval(updateCountdown, 1000);
+    return () => window.clearInterval(timer);
+  }, [activeAttempt]);
 
   async function loadQuizzes() {
     try {
@@ -90,6 +110,7 @@ export default function App() {
         body: JSON.stringify({
           title: quiz.title,
           instructions: quiz.instructions,
+          durationMinutes: Number(quiz.durationMinutes || 10),
           questions: quiz.questions.map(question => ({
             prompt: question.prompt,
             options: question.options.split("\n").map(option => option.trim()).filter(Boolean),
@@ -104,6 +125,77 @@ export default function App() {
       loadQuizzes();
     } catch (error) {
       setMessage(error.message || "Could not reach the server. Check that the API is running.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function startQuiz(quizId) {
+    setBusy(true);
+    setMessage("");
+    setQuizResult(null);
+    try {
+      const response = await fetch(`/api/quizzes/${quizId}/start`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.token}` }
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error?.message ?? "Could not start this quiz.");
+      setActiveAttempt({ ...body.data.attempt, quiz: body.data.quiz });
+      setSelectedAnswers({});
+    } catch (error) {
+      setMessage(error.message || "Could not reach the server.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function toggleQuizAvailability(item) {
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch(`/api/quizzes/${item.id}/active`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+        body: JSON.stringify({ active: !item.isActive })
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error?.message ?? "Could not update quiz availability.");
+      await loadQuizzes();
+      setMessage(`${item.title} is now ${body.data.quiz.active ? "available to students" : "hidden from students"}.`);
+    } catch (error) {
+      setMessage(error.message || "Could not reach the server.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitQuiz(event) {
+    event.preventDefault();
+    if (!activeAttempt) return;
+    const unanswered = activeAttempt.quiz.questions.filter(question => !selectedAnswers[question.id]);
+    if (unanswered.length) {
+      setMessage(`Answer all questions before submitting (${unanswered.length} remaining).`);
+      return;
+    }
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch(`/api/quizzes/${activeAttempt.quiz.id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+        body: JSON.stringify({
+          attemptId: activeAttempt.id,
+          answers: activeAttempt.quiz.questions.map(question => ({ questionId: question.id, answer: selectedAnswers[question.id] }))
+        })
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error?.message ?? "Could not submit this quiz.");
+      setQuizResult(body.data.result);
+      setActiveAttempt(null);
+      setMessage("Quiz submitted successfully.");
+    } catch (error) {
+      setMessage(error.message || "Could not reach the server.");
     } finally {
       setBusy(false);
     }
@@ -153,9 +245,48 @@ export default function App() {
               {!canCreateQuiz ? (
                 <div className="success-panel">
                   <div className="success-icon">✓</div>
-                  <p className="support-copy">Your account is ready, <strong>{session.user.email}</strong>.</p>
+                  <p className="support-copy">Choose an available quiz and complete it before the timer expires.</p>
                   <div className="account-chip"><span className="avatar">{session.user.email[0].toUpperCase()}</span><span><strong>{session.user.email}</strong><small>{session.user.role} account</small></span></div>
-                  <p className="terms">Quiz creation is available to teacher and administrator accounts.</p>
+                  {activeAttempt ? (
+                    <form className="quiz-taking" onSubmit={submitQuiz}>
+                      <div className="quiz-item-header"><h3>{activeAttempt.quiz.title}</h3><strong className={secondsLeft < 60 ? "timer warning" : "timer"} aria-live="polite">Time left: {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, "0")}</strong></div>
+                      <p className="quiz-item-instructions">{activeAttempt.quiz.instructions}</p>
+                      {activeAttempt.quiz.questions.map((question, index) => (
+                        <fieldset className="question-editor" key={question.id}>
+                          <legend>Question {index + 1}</legend>
+                          <p><strong>{question.prompt}</strong></p>
+                          {question.options.map(option => (
+                            <label className="answer-choice" key={option}>
+                              <input type="radio" name={`answer-${question.id}`} value={option} checked={selectedAnswers[question.id] === option} onChange={() => setSelectedAnswers(current => ({ ...current, [question.id]: option }))} />
+                              <span>{option}</span>
+                            </label>
+                          ))}
+                        </fieldset>
+                      ))}
+                      {message && <p className="notice" role="status">{message}</p>}
+                      <button className="button" type="submit" disabled={busy}>{busy ? "Submitting…" : "Submit quiz"}<span aria-hidden="true">→</span></button>
+                    </form>
+                  ) : quizResult ? (
+                    <section className="result-card" aria-live="polite">
+                      <h3>Your result</h3>
+                      <p><strong>{quizResult.correct} / {quizResult.total} correct ({quizResult.percentage}%)</strong></p>
+                      <button className="text-button" type="button" onClick={() => setQuizResult(null)}>Back to available quizzes</button>
+                    </section>
+                  ) : (
+                    <section className="quiz-management">
+                      <h3>Available quizzes</h3>
+                      {quizzes.length === 0 ? <p className="field-hint">There are no quizzes available yet.</p> : (
+                        <div className="quiz-list">{quizzes.map(item => (
+                          <div key={item.id} className="quiz-item">
+                            <div className="quiz-item-header"><strong>{item.title}</strong><span>{item.questionCount} question(s) · {item.durationMinutes} min</span></div>
+                            <p className="quiz-item-instructions">{item.instructions}</p>
+                            <button className="button" type="button" disabled={busy} onClick={() => startQuiz(item.id)}>Start quiz<span aria-hidden="true">→</span></button>
+                          </div>
+                        ))}</div>
+                      )}
+                      {message && <p className="notice" role="status">{message}</p>}
+                    </section>
+                  )}
                 </div>
               ) : (
                 <>
@@ -189,6 +320,8 @@ export default function App() {
                     <input id="quiz-title" required maxLength={120} value={quiz.title} onChange={event => setQuiz({ ...quiz, title: event.target.value })} placeholder="e.g. Science basics" />
                     <label htmlFor="quiz-instructions">Instructions</label>
                     <textarea id="quiz-instructions" required maxLength={2000} rows={3} value={quiz.instructions} onChange={event => setQuiz({ ...quiz, instructions: event.target.value })} placeholder="Tell students how to complete this quiz" />
+                    <label htmlFor="quiz-duration">Time limit (minutes)</label>
+                    <input id="quiz-duration" type="number" required min="1" max="180" value={quiz.durationMinutes ?? 10} onChange={event => setQuiz({ ...quiz, durationMinutes: event.target.value })} />
                     {quiz.questions.map((question, index) => {
                       const parsedOptions = question.options.split("\n").map(o => o.trim()).filter(Boolean);
                       const optionCount = parsedOptions.length;
@@ -244,9 +377,10 @@ export default function App() {
                           <div key={q.id} className="quiz-item">
                             <div className="quiz-item-header">
                               <strong>{q.title}</strong>
-                              <span>{q.questions?.length ?? 0} question(s)</span>
+                              <span>{q.questions?.length ?? 0} question(s) · {q.durationMinutes} min · {q.isActive ? "Active" : "Hidden"}</span>
                             </div>
                             <p className="quiz-item-instructions">{q.instructions}</p>
+                            <button type="button" className="text-button availability-button" disabled={busy} onClick={() => toggleQuizAvailability(q)}>{q.isActive ? "Hide from students" : "Make available"}</button>
                           </div>
                         ))}
                       </div>

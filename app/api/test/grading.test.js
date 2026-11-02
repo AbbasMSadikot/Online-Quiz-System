@@ -31,15 +31,27 @@ async function createFixture() {
   return { quiz, token: login.body.data.token };
 }
 
+async function startAttempt(quizId, token) {
+  const response = await request(app).post(`/api/quizzes/${quizId}/start`).set("Authorization", `Bearer ${token}`);
+  assert.equal(response.status, 201);
+  return response.body.data.attempt;
+}
+
 test("returns full, zero, and partial scores without exposing the answer key", async () => {
   const { quiz, token } = await createFixture();
   const answers = quiz.questions.map(question => ({ questionId: question.id, answer: question.position === 1 ? "A" : "D" }));
-  const full = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ answers });
-  assert.deepEqual(full.body.data.result, { quizId: quiz.id, correct: 2, total: 2, percentage: 100 });
-  const zero = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ answers: answers.map(answer => ({ ...answer, answer: "wrong" })) });
-  assert.deepEqual(zero.body.data.result, { quizId: quiz.id, correct: 0, total: 2, percentage: 0 });
-  const partial = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ answers: [{ ...answers[0], answer: "A" }, { ...answers[1], answer: "wrong" }] });
-  assert.deepEqual(partial.body.data.result, { quizId: quiz.id, correct: 1, total: 2, percentage: 50 });
+  const fullAttempt = await startAttempt(quiz.id, token);
+  const full = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: fullAttempt.id, answers });
+  assert.deepEqual(full.body.data.result, { quizId: quiz.id, attemptId: fullAttempt.id, correct: 2, total: 2, percentage: 100, submittedAt: full.body.data.result.submittedAt });
+  const zeroAttempt = await startAttempt(quiz.id, token);
+  const zero = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: zeroAttempt.id, answers: answers.map(answer => ({ ...answer, answer: "wrong" })) });
+  assert.equal(zero.body.data.result.correct, 0);
+  assert.equal(zero.body.data.result.percentage, 0);
+  const partialAttempt = await startAttempt(quiz.id, token);
+  const partial = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: partialAttempt.id, answers: [{ ...answers[0], answer: "A" }, { ...answers[1], answer: "wrong" }] });
+  assert.equal(partial.body.data.result.correct, 1);
+  assert.equal(partial.body.data.result.total, 2);
+  assert.equal(partial.body.data.result.percentage, 50);
   assert.equal(JSON.stringify(full.body).includes("correctAnswer"), false);
 });
 
@@ -47,12 +59,33 @@ test("rejects incomplete, duplicate, unknown, unauthenticated, and non-student s
   const { quiz, token } = await createFixture();
   const [first, second] = quiz.questions;
   for (const answers of [[{ questionId: first.id, answer: "A" }], [{ questionId: first.id, answer: "A" }, { questionId: first.id, answer: "A" }], [{ questionId: 99999, answer: "A" }, { questionId: second.id, answer: "D" }]]) {
-    const response = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ answers });
+    const attempt = await startAttempt(quiz.id, token);
+    const response = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: attempt.id, answers });
     assert.equal(response.status, 400);
   }
-  const unauthenticated = await request(app).post(`/api/quizzes/${quiz.id}/submit`).send({ answers: [] });
+  const unauthenticated = await request(app).post(`/api/quizzes/${quiz.id}/submit`).send({ attemptId: 1, answers: [] });
   assert.equal(unauthenticated.status, 401);
   const teacher = await request(app).post("/api/auth/login").send({ email: "teacher@example.com", password: "correct horse battery" });
-  const forbidden = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${teacher.body.data.token}`).send({ answers: [] });
+  const forbidden = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${teacher.body.data.token}`).send({ attemptId: 1, answers: [] });
   assert.equal(forbidden.status, 403);
+});
+
+test("enforces the server-side deadline and permits a submission only once", async () => {
+  const { quiz, token } = await createFixture();
+  const attempt = await startAttempt(quiz.id, token);
+  const answers = quiz.questions.map(question => ({ questionId: question.id, answer: "A" }));
+  await prisma.quizAttempt.update({ where: { id: attempt.id }, data: { expiresAt: new Date(Date.now() - 1000) } });
+  const late = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: attempt.id, answers });
+  assert.equal(late.status, 410);
+
+  const validAttempt = await startAttempt(quiz.id, token);
+  const accepted = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: validAttempt.id, answers });
+  assert.equal(accepted.status, 200);
+  assert.ok(accepted.body.data.result.submittedAt);
+  const savedAttempt = await prisma.quizAttempt.findUnique({ where: { id: validAttempt.id } });
+  assert.equal(savedAttempt.quizId, quiz.id);
+  assert.equal(savedAttempt.correct, accepted.body.data.result.correct);
+  assert.deepEqual(JSON.parse(savedAttempt.answersJson), answers);
+  const duplicate = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: validAttempt.id, answers });
+  assert.equal(duplicate.status, 409);
 });

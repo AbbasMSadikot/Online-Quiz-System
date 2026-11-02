@@ -11,6 +11,7 @@
     "db:seed": "node src/seed.js",
     "verify:tls": "node scripts/verify-tls.mjs",
     "benchmark:grading": "node --env-file=.env.test scripts/benchmark-grading.mjs",
+    "load-test:500": "node --env-file=.env.test scripts/load-test-500.mjs",
     "test": "node --env-file=.env.test --test --test-concurrency=1"
   },
   "dependencies": {

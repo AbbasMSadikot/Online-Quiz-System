@@ -93,15 +93,56 @@ test("lists quizzes created by the authorized teacher in the quiz management lis
   assert.equal(response.body.data.quizzes[0].questions.length, 1);
 });
 
-test("rejects student access to teacher quiz management list", async () => {
+test("allows students to view the available quiz list", async () => {
   const registration = await request(app).post("/api/auth/register")
     .send({ email: "student@example.com", password: "correct horse battery" });
 
-  const denied = await request(app)
+  const response = await request(app)
     .get("/api/quizzes")
     .set("Authorization", `Bearer ${registration.body.data.token}`);
 
-  assert.equal(denied.status, 403);
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body.data.quizzes, []);
+});
+
+test("lists available quizzes to students without revealing answer keys", async () => {
+  const passwordHash = await bcrypt.hash("correct horse battery", 4);
+  const teacher = await prisma.user.create({ data: { email: "quiz-owner@example.com", passwordHash, role: "teacher" } });
+  const student = await prisma.user.create({ data: { email: "quiz-taker@example.com", passwordHash, role: "student" } });
+  const quiz = await prisma.quiz.create({ data: {
+    title: "Take me", instructions: "Select one answer.", durationMinutes: 7, ownerId: teacher.id,
+    questions: { create: [{ position: 1, prompt: "Pick A", optionsJson: JSON.stringify(["A", "B"]), correctAnswer: "A" }] }
+  } });
+  const login = await request(app).post("/api/auth/login").send({ email: student.email, password: "correct horse battery" });
+  const response = await request(app).get("/api/quizzes").set("Authorization", `Bearer ${login.body.data.token}`);
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body.data.quizzes, [{ id: quiz.id, title: "Take me", instructions: "Select one answer.", durationMinutes: 7, questionCount: 1 }]);
+
+  const attempt = await request(app).post(`/api/quizzes/${quiz.id}/start`).set("Authorization", `Bearer ${login.body.data.token}`);
+  assert.equal(attempt.status, 201);
+  assert.deepEqual(attempt.body.data.quiz.questions[0].options, ["A", "B"]);
+  assert.equal("correctAnswer" in attempt.body.data.quiz.questions[0], false);
+  assert.equal(new Date(attempt.body.data.attempt.expiresAt).getTime() - new Date(attempt.body.data.attempt.startedAt).getTime(), 7 * 60_000);
+});
+
+test("teachers can hide and republish their quizzes", async () => {
+  const passwordHash = await bcrypt.hash("correct horse battery", 4);
+  const teacher = await prisma.user.create({ data: { email: "publisher@example.com", passwordHash, role: "teacher" } });
+  const student = await prisma.user.create({ data: { email: "reader@example.com", passwordHash, role: "student" } });
+  const quiz = await prisma.quiz.create({ data: {
+    title: "Published quiz", instructions: "Instructions", ownerId: teacher.id,
+    questions: { create: [{ position: 1, prompt: "Question?", optionsJson: JSON.stringify(["A", "B"]), correctAnswer: "A" }] }
+  } });
+  const teacherLogin = await request(app).post("/api/auth/login").send({ email: teacher.email, password: "correct horse battery" });
+  const studentLogin = await request(app).post("/api/auth/login").send({ email: student.email, password: "correct horse battery" });
+  const hidden = await request(app).patch(`/api/quizzes/${quiz.id}/active`).set("Authorization", `Bearer ${teacherLogin.body.data.token}`).send({ active: false });
+  assert.equal(hidden.status, 200);
+  const list = await request(app).get("/api/quizzes").set("Authorization", `Bearer ${studentLogin.body.data.token}`);
+  assert.deepEqual(list.body.data.quizzes, []);
+  const unavailable = await request(app).post(`/api/quizzes/${quiz.id}/start`).set("Authorization", `Bearer ${studentLogin.body.data.token}`);
+  assert.equal(unavailable.status, 404);
+  const published = await request(app).patch(`/api/quizzes/${quiz.id}/active`).set("Authorization", `Bearer ${teacherLogin.body.data.token}`).send({ active: true });
+  assert.equal(published.body.data.quiz.active, true);
 });
 
 test("rejects quiz creation without authentication and for a student", async () => {
