@@ -5,7 +5,7 @@ The submitted baseline [SRS.pdf](SRS.pdf) is stored in this folder. Keep the sub
 ## Evidence checklist
 
 - [x] Submitted SRS copy and version
-- [ ] Work breakdown steps with owners, dependencies, and sprint mapping
-- [ ] Requirement-to-work mapping consistent with the repository backlog
+- [x] Work breakdown steps with owners, dependencies, and sprint mapping
+- [x] Requirement-to-work mapping consistent with the repository backlog
 
 See [work-breakdown.md](work-breakdown.md).
