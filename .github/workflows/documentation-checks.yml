@@ -21,6 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           for file in \
+            "docs/DELIVERABLE-COMPLETION-MATRIX.md" \
             "docs/1-SRS-and-WBS/SRS.pdf" \
             "docs/4-Architecture-and-Design/Software Architecture & Design Specification.pdf" \
             "docs/2-Test-Planning/Test Plan.pdf" \
@@ -31,8 +32,10 @@ jobs:
             "docs/3-Requirements-Engineering/README.md" \
             "docs/3-Requirements-Engineering/RTM.md" \
             "docs/4-Architecture-and-Design/README.md" \
+            "docs/4-Architecture-and-Design/diagrams.md" \
             "docs/5-Project-and-Sprint-Evidence/README.md" \
             "docs/6-Copilot-Evidence/README.md" \
+            "docs/6-Copilot-Evidence/chatgpt-assisted-work-log.md" \
             "docs/7-Testing-Tools-and-Fixes/README.md" \
             "docs/8-Deployment-and-Environment/README.md" \
             "docs/9-Demo/README.md"; do

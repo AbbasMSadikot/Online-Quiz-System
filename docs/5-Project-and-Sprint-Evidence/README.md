@@ -1,6 +1,8 @@
 # Project and Sprint Evidence
 
-The repository has an existing GitHub Project linked to Online-Quiz-System: https://github.com/users/AbbasMSadikot/projects/1. In the last board review (19 November 2026), the Story Points field was blank on visible items; issues #12–#16 were placed in Sprint 3 even though the course brief specifies two sprints. The issue pages had assignees and closed states, but those states do not prove a reviewer approved the associated PRs. Recheck the live board before submission; the repository does not reproduce the board's full history.
+The repository has an existing GitHub Project linked to Online-Quiz-System: https://github.com/users/AbbasMSadikot/projects/1. In the 19 November 2026 board review, issues #2–#5 were in Sprint 1, #6–#11 in Sprint 2, and #12–#16 in Sprint 3. All displayed Story Points cells were blank, and the issues were assigned and closed. The Sprint 3 entries conflict with the brief's two-sprint plan; closed status does not prove tests passed or that a reviewer approved the associated PRs. No board screenshot is checked in.
+
+See the [deliverable completion matrix](../DELIVERABLE-COMPLETION-MATRIX.md) for the combined status of Part 1 and Part 2 requirements.
 
 ## Evidence to capture
 

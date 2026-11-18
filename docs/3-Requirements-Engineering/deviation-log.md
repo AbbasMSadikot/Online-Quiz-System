@@ -1,6 +1,6 @@
 # Deviation and Gap Log
 
-Compared with the submitted SRS, Software Architecture and Design Specification (SAD), and Test Plan on 30 October 2026. The original PDFs remain unchanged.
+Current disposition as of 19 November 2026 against the submitted SRS, Software Architecture and Design Specification (SAD), and Test Plan. Historical observation dates remain in each record. The original PDFs remain unchanged.
 
 | Ref | Source baseline | Affected requirement/test/design | Current implementation or gap | Rationale | Disposition |
 | --- | --- | --- | --- | --- | --- |

@@ -1,6 +1,6 @@
 # Test-plan execution and traceability
 
-This record separates historical results from checks still due. Source review date: 19 November 2026. Baseline: [submitted Test Plan PDF](Test%20Plan.pdf). Environment for documented local test records is Node.js, Express/Supertest, Prisma, and SQLite; the Test Plan names PostgreSQL, so results here do not claim PostgreSQL validation.
+This record separates current automated/local verification from manual cases that have not been signed off. Last source review: 19 November 2026. Baseline: [submitted Test Plan PDF](Test%20Plan.pdf). Environment for local records is Node.js, Express/Supertest, Prisma, and SQLite; the Test Plan names PostgreSQL, so these results do not claim PostgreSQL validation.
 
 ## Requirement and test coverage map
 
@@ -15,8 +15,8 @@ This record separates historical results from checks still due. Source review da
 | NFR1 under 2 seconds | Benchmark script and [performance records](../7-Testing-Tools-and-Fixes/NFR1-performance-verification-2026-10-31.md), [later run](../7-Testing-Tools-and-Fixes/FR3-and-NFR2-verification-2026-11-02.md) | Local sequential profile only; not external network/production evidence. |
 | NFR2 500 concurrent students | Load-test script and [local 500-client record](../7-Testing-Tools-and-Fixes/FR3-and-NFR2-verification-2026-11-02.md) | Synthetic local SQLite exercise only. Production profile/degradation criteria remain unverified. |
 | NFR3 usability | [Teacher usability record](../7-Testing-Tools-and-Fixes/NFR3-teacher-usability-session-2026-10-30.md) | Trial record reports mean training time; sample/context are in that evidence file. |
-| Security test plan: SQL injection / XSS | `app/api/test/auth.test.js` rejects SQL-injection-shaped quiz IDs; `app/web/test/security.test.js` verifies hostile quiz content is rendered as escaped text through `SafeText` | Focused regression tests added 19 Nov; this is not a full penetration test. |
-| TC-04 no quiz retake after submission | New regression in `app/api/test/grading.test.js` | Source change added 19 Nov; not yet run at time of this document. |
+| Security test plan: SQL injection / XSS | `app/api/test/auth.test.js` rejects SQL-injection-shaped quiz IDs; `app/web/test/security.test.js` verifies hostile quiz content is rendered as escaped text through `SafeText` | Focused regression tests passed 19 Nov; this is not a full penetration test. |
+| TC-04 no quiz retake after submission | `app/api/test/grading.test.js` | Regression passed in the 19 Nov API run. |
 
 ## Execution record
 

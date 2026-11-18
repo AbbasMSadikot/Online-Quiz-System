@@ -1,5 +1,7 @@
 # Sprint 2 Submission Freeze — 31 October 2026
 
+> Historical submission snapshot only. FR3, FR4, local 500-client testing, grade history, and admin user management were implemented after this date. Use the current [RTM](../3-Requirements-Engineering/RTM.md) and [deliverable matrix](../DELIVERABLE-COMPLETION-MATRIX.md) for present-day status; do not treat this dated freeze as a statement about the current code.
+
 ## Freeze decision
 
 Freeze the current `main` snapshot for the mini-project submission on 31 October 2026. This is a documentation and submission freeze with known gaps; it is **not** a declaration that every SRS requirement or every team's backlog issue is complete.

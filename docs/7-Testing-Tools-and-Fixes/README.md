@@ -2,6 +2,8 @@
 
 Record the tools actually used, findings, patches, and retests. Do not claim a pass when a prerequisite feature is missing.
 
+- Change and retest provenance: [work log](../6-Copilot-Evidence/chatgpt-assisted-work-log.md)
+
 - [SEC2 role-based access verification](SEC2-RBAC-verification-2026-10-30.md)
 - [NFR1 grading performance verification](NFR1-performance-verification-2026-10-31.md)
 - [NFR3 teacher usability session record](NFR3-teacher-usability-session-2026-10-30.md)

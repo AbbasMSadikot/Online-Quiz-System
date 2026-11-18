@@ -36,7 +36,7 @@ The local database is created from the `DATABASE_URL` in `app/api/.env`; the exa
 
 ## Test and production limitations
 
-- GitHub Actions runs Prisma setup, API tests, and the React production build.
+- GitHub Actions runs Prisma setup, API tests, the web security test, the grading benchmark, and the React production build.
 - No rollback/migration plan for a hosted database has been validated. Back up any local database file before changing the Prisma schema.
 - A production hosting target and certificate lifecycle are deployment responsibilities. The API's HTTPS mode is configured for TLS 1.2+ and the `verify:tls` probe records the negotiated protocol. Do not use the local HTTP development server for real user data.
 - Store deployment screenshots and sanitized logs in this folder after an actual target has been selected and deployed.

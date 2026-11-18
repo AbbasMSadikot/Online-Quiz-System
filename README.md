@@ -85,11 +85,11 @@ Requirements: Node.js 22 or newer and npm.
 
 ## Verification
 
-From the repository root, run `npm run build` for the web production build. For API tests, copy `app/api/.env.test` to `app/api/.env`, then run:
+From the repository root, run the following. API tests and benchmarks load `app/api/.env.test` themselves; keep the test database separate from the development `.env` database.
 
 ```sh
 npm run db:generate --workspace @online-quiz/api
-npm run db:push --workspace @online-quiz/api
+DATABASE_URL=file:./test.db npm run db:push --workspace @online-quiz/api
 npm test --workspace @online-quiz/api
 npm test --workspace @online-quiz/web
 npm run build
@@ -105,6 +105,8 @@ The API test suite covers registration, email normalization, required-field vali
 See GitHub issues [#2 – FR1 User Authentication](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/2), [#3 – FR2 Teacher Quiz Creation](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/3), [#9 – NFR3 Teacher Quiz Creation Usability](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/9), and [#13 – DEMO Sprint 2 Working Product Video](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/13) for acceptance criteria and implementation history.
 
 The nine evidence folders map to the submission checklist:
+
+See the [deliverable completion matrix](docs/DELIVERABLE-COMPLETION-MATRIX.md) for a current evidence-by-evidence status of both parts of the assignment.
 
 1. [SRS and WBS](docs/1-SRS-and-WBS/)
 2. [Test Planning](docs/2-Test-Planning/)

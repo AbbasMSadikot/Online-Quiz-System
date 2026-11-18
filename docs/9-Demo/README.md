@@ -28,6 +28,7 @@ This is a historical Sprint 2 presentation, not proof of current working product
 - [ ] Record a clean end-to-end video on the current build; remove browser/debug overlays and use synthetic accounts/data.
 - [ ] Show a teacher signing in, creating a quiz, and publishing it.
 - [ ] Show a separate student signing in, selecting that teacher's quiz, answering, submitting, and receiving a score.
+- [ ] Show the student's grade history after submitting a quiz; if time permits, show the admin account list and role controls.
 - [ ] Show the server-enforced timer/no-answer-key behavior or explain it from the API/tests.
 - [ ] State known limitations: local SQLite vs PostgreSQL baseline; no hosted HTTPS proof; historical GitHub PRs lack recorded reviewer submissions.
 - [ ] Upload the real capture here, document capture date/participants, and make sure no credentials/private information appear.
@@ -38,6 +39,6 @@ This is a historical Sprint 2 presentation, not proof of current working product
 2. “Teachers create and publish multiple-choice quizzes with instructions and a duration.”
 3. “Students see active quizzes, start a timed attempt, and submit answers. The server owns the deadline and grading; the browser timer is only a display.”
 4. “The API returns the score without exposing correct answers. A submitted quiz cannot be retaken; an unfinished attempt can be resumed until expiry.”
-5. “Automated API tests and CI cover core routes. Local performance/load evidence has limits. Deployment HTTPS and full SRS grade-history/admin-user features remain gaps.”
+5. “Automated API tests and CI cover core routes. Students can review submitted scores, and admins can manage student/teacher roles. Local performance/load evidence has limits; deployment HTTPS and the PostgreSQL environment from the Test Plan remain unverified.”
 
 The current checkout does not contain a fresh capture, so this folder intentionally does not claim the final demo requirement is complete.

@@ -1,5 +1,7 @@
 # FR4 automatic grading verification
 
+> Historical verification as of 31 October 2026. The following note that FR3 was still missing was true on that date and is superseded by the [2 November FR3/NFR2 verification](FR3-and-NFR2-verification-2026-11-02.md) and current test record.
+
 Date: 31 October 2026
 
 The API now exposes `POST /api/quizzes/{quizId}/submit` for authenticated student accounts. A submission must contain exactly one answer for every question, and the response returns only `correct`, `total`, and `percentage`; stored answer keys are never returned.
