@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { SafeText } from "./SafeText.js";
 
 const emptyQuestion = () => ({ prompt: "", options: "", correctAnswer: "" });
 
@@ -249,16 +250,16 @@ export default function App() {
                   <div className="account-chip"><span className="avatar">{session.user.email[0].toUpperCase()}</span><span><strong>{session.user.email}</strong><small>{session.user.role} account</small></span></div>
                   {activeAttempt ? (
                     <form className="quiz-taking" onSubmit={submitQuiz}>
-                      <div className="quiz-item-header"><h3>{activeAttempt.quiz.title}</h3><strong className={secondsLeft < 60 ? "timer warning" : "timer"} aria-live="polite">Time left: {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, "0")}</strong></div>
-                      <p className="quiz-item-instructions">{activeAttempt.quiz.instructions}</p>
+                      <div className="quiz-item-header"><h3><SafeText value={activeAttempt.quiz.title} /></h3><strong className={secondsLeft < 60 ? "timer warning" : "timer"} aria-live="polite">Time left: {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, "0")}</strong></div>
+                      <p className="quiz-item-instructions"><SafeText value={activeAttempt.quiz.instructions} /></p>
                       {activeAttempt.quiz.questions.map((question, index) => (
                         <fieldset className="question-editor" key={question.id}>
                           <legend>Question {index + 1}</legend>
-                          <p><strong>{question.prompt}</strong></p>
+                          <p><strong><SafeText value={question.prompt} /></strong></p>
                           {question.options.map(option => (
                             <label className="answer-choice" key={option}>
                               <input type="radio" name={`answer-${question.id}`} value={option} checked={selectedAnswers[question.id] === option} onChange={() => setSelectedAnswers(current => ({ ...current, [question.id]: option }))} />
-                              <span>{option}</span>
+                              <span><SafeText value={option} /></span>
                             </label>
                           ))}
                         </fieldset>
@@ -278,8 +279,8 @@ export default function App() {
                       {quizzes.length === 0 ? <p className="field-hint">There are no quizzes available yet.</p> : (
                         <div className="quiz-list">{quizzes.map(item => (
                           <div key={item.id} className="quiz-item">
-                            <div className="quiz-item-header"><strong>{item.title}</strong><span>{item.questionCount} question(s) · {item.durationMinutes} min</span></div>
-                            <p className="quiz-item-instructions">{item.instructions}</p>
+                            <div className="quiz-item-header"><strong><SafeText value={item.title} /></strong><span>{item.questionCount} question(s) · {item.durationMinutes} min</span></div>
+                            <p className="quiz-item-instructions"><SafeText value={item.instructions} /></p>
                             <button className="button" type="button" disabled={busy} onClick={() => startQuiz(item.id)}>Start quiz<span aria-hidden="true">→</span></button>
                           </div>
                         ))}</div>
@@ -376,10 +377,10 @@ export default function App() {
                         {quizzes.map(q => (
                           <div key={q.id} className="quiz-item">
                             <div className="quiz-item-header">
-                              <strong>{q.title}</strong>
+                              <strong><SafeText value={q.title} /></strong>
                               <span>{q.questions?.length ?? 0} question(s) · {q.durationMinutes} min · {q.isActive ? "Active" : "Hidden"}</span>
                             </div>
-                            <p className="quiz-item-instructions">{q.instructions}</p>
+                            <p className="quiz-item-instructions"><SafeText value={q.instructions} /></p>
                             <button type="button" className="text-button availability-button" disabled={busy} onClick={() => toggleQuizAvailability(q)}>{q.isActive ? "Hide from students" : "Make available"}</button>
                           </div>
                         ))}

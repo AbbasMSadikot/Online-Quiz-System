@@ -10,4 +10,4 @@ The submitted baseline [Test Plan.pdf](Test%20Plan.pdf) is stored in this folder
 - [x] Security (SEC2), usability (NFR3), performance (NFR1), and local concurrency (NFR2) evidence recorded in [Testing Tools and Fixes](../7-Testing-Tools-and-Fixes/); read each record's limitations
 - [x] Test-plan mapping and known execution limits recorded in [execution and traceability record](execution-and-traceability.md)
 
-The submitted PDF is preserved as the baseline. Current code implements FR3 and FR4. TC-04's post-submission no-retake rule is enforced by the API and its regression test passed in the 19 November 2026 API run. The execution record distinguishes this local run from historical CI and deployment evidence.
+The submitted PDF is preserved as the baseline. Current code implements FR3 and FR4. TC-04's post-submission no-retake rule and focused hostile-input cases passed the local API/web test runs recorded on 19 November 2026. The execution record separates this evidence from production/deployment verification.

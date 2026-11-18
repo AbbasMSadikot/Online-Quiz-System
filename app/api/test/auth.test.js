@@ -105,6 +105,17 @@ test("allows students to view the available quiz list", async () => {
   assert.deepEqual(response.body.data.quizzes, []);
 });
 
+test("rejects SQL-injection-shaped quiz IDs as invalid input", async () => {
+  const registration = await request(app).post("/api/auth/register")
+    .send({ email: "security-student@example.com", password: "correct horse battery" });
+  const response = await request(app)
+    .post("/api/quizzes/1%20OR%201%3D1/start")
+    .set("Authorization", `Bearer ${registration.body.data.token}`);
+
+  assert.equal(response.status, 400);
+  assert.equal(response.body.success, false);
+});
+
 test("lists available quizzes to students without revealing answer keys", async () => {
   const passwordHash = await bcrypt.hash("correct horse battery", 4);
   const teacher = await prisma.user.create({ data: { email: "quiz-owner@example.com", passwordHash, role: "teacher" } });

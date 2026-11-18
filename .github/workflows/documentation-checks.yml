@@ -27,6 +27,7 @@ jobs:
             "docs/1-SRS-and-WBS/README.md" \
             "docs/1-SRS-and-WBS/work-breakdown.md" \
             "docs/2-Test-Planning/README.md" \
+            "docs/2-Test-Planning/execution-and-traceability.md" \
             "docs/3-Requirements-Engineering/README.md" \
             "docs/3-Requirements-Engineering/RTM.md" \
             "docs/4-Architecture-and-Design/README.md" \
