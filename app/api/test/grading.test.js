@@ -37,18 +37,27 @@ async function startAttempt(quizId, token) {
   return response.body.data.attempt;
 }
 
+async function createStudentToken(email) {
+  const passwordHash = await bcrypt.hash("correct horse battery", 4);
+  const student = await prisma.user.create({ data: { email, passwordHash, role: "student" } });
+  const login = await request(app).post("/api/auth/login").send({ email, password: "correct horse battery" });
+  return login.body.data.token;
+}
+
 test("returns full, zero, and partial scores without exposing the answer key", async () => {
   const { quiz, token } = await createFixture();
   const answers = quiz.questions.map(question => ({ questionId: question.id, answer: question.position === 1 ? "A" : "D" }));
   const fullAttempt = await startAttempt(quiz.id, token);
   const full = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: fullAttempt.id, answers });
   assert.deepEqual(full.body.data.result, { quizId: quiz.id, attemptId: fullAttempt.id, correct: 2, total: 2, percentage: 100, submittedAt: full.body.data.result.submittedAt });
-  const zeroAttempt = await startAttempt(quiz.id, token);
-  const zero = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: zeroAttempt.id, answers: answers.map(answer => ({ ...answer, answer: "wrong" })) });
+  const zeroToken = await createStudentToken("zero@example.com");
+  const zeroAttempt = await startAttempt(quiz.id, zeroToken);
+  const zero = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${zeroToken}`).send({ attemptId: zeroAttempt.id, answers: answers.map(answer => ({ ...answer, answer: "wrong" })) });
   assert.equal(zero.body.data.result.correct, 0);
   assert.equal(zero.body.data.result.percentage, 0);
-  const partialAttempt = await startAttempt(quiz.id, token);
-  const partial = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: partialAttempt.id, answers: [{ ...answers[0], answer: "A" }, { ...answers[1], answer: "wrong" }] });
+  const partialToken = await createStudentToken("partial@example.com");
+  const partialAttempt = await startAttempt(quiz.id, partialToken);
+  const partial = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${partialToken}`).send({ attemptId: partialAttempt.id, answers: [{ ...answers[0], answer: "A" }, { ...answers[1], answer: "wrong" }] });
   assert.equal(partial.body.data.result.correct, 1);
   assert.equal(partial.body.data.result.total, 2);
   assert.equal(partial.body.data.result.percentage, 50);
@@ -88,4 +97,17 @@ test("enforces the server-side deadline and permits a submission only once", asy
   assert.deepEqual(JSON.parse(savedAttempt.answersJson), answers);
   const duplicate = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: validAttempt.id, answers });
   assert.equal(duplicate.status, 409);
+});
+
+test("prevents a student from starting the same quiz more than once", async () => {
+  const { quiz, token } = await createFixture();
+  const first = await startAttempt(quiz.id, token);
+  const answers = quiz.questions.map(question => ({ questionId: question.id, answer: "A" }));
+  const submitted = await request(app).post(`/api/quizzes/${quiz.id}/submit`).set("Authorization", `Bearer ${token}`).send({ attemptId: first.id, answers });
+  assert.equal(submitted.status, 200);
+  const retake = await request(app).post(`/api/quizzes/${quiz.id}/start`).set("Authorization", `Bearer ${token}`);
+  assert.equal(retake.status, 409);
+  assert.match(retake.body.error.message, /retakes are not allowed/i);
+  assert.equal(await prisma.quizAttempt.count({ where: { quizId: quiz.id } }), 1);
+  assert.ok(first.id);
 });

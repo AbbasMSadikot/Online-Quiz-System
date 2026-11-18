@@ -1,0 +1,37 @@
+@startuml
+title Sequence — student takes timed quiz (19 Nov 2026)
+actor Student
+participant "React Student Workspace" as UI
+participant "Express Quiz Router" as API
+participant "JWT middleware" as Auth
+participant "Prisma Client" as ORM
+database SQLite
+Student -> UI : Select available quiz
+UI -> API : GET /api/quizzes + Bearer JWT
+API -> Auth : Verify student identity
+Auth --> API : Authenticated principal
+API -> ORM : List active quizzes
+ORM -> SQLite : Query active quiz metadata
+SQLite --> ORM : Metadata without answer keys
+ORM --> API : Available quizzes
+API --> UI : 200 + quiz list
+Student -> UI : Start quiz
+UI -> API : POST /api/quizzes/{id}/start
+API -> Auth : Verify student identity
+Auth --> API : Authenticated principal
+API -> ORM : Check availability / prior submission; create attempt
+ORM -> SQLite : Persist attempt and deadline
+SQLite --> ORM : Attempt created
+ORM --> API : Questions and attempt
+API --> UI : 201 + options, attemptId, expiresAt
+Student -> UI : Answer and submit
+UI -> API : POST /api/quizzes/{id}/submit
+API -> Auth : Verify student identity
+Auth --> API : Authenticated principal
+API -> ORM : Load attempt, grade, enforce deadline, persist once
+ORM -> SQLite : Update attempt result
+SQLite --> ORM : Persisted score
+ORM --> API : Score and total
+API --> UI : 200 + percentage, no answer key
+UI --> Student : Display result
+@enduml

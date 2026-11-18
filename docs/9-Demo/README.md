@@ -1,52 +1,43 @@
 # Mini-Project Demos
 
-Store the actual working-product recordings here, or link to files committed in this folder.
+The two recordings below are historical sprint artifacts. Preserve them as recorded and describe their visible contents accurately. Neither is a current end-to-end demonstration of the completed product.
 
-## Submission checklist
+## Historical recordings
 
-- [x] Sprint 1 scope demo: 59.99-second retrospective recording captured 31 October 2026 (Assigned to AbbasMSadikot, [Issue #12](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/12))
-- [x] Sprint 2 demo: approximately two minutes, recorded for Sprint 2 (26–30 Oct 2026) (Assigned to Aditya Mandir, [Issue #13](https://github.com/AbbasMSadikot/Online-Quiz-System/issues/13))
-- [x] Show the implemented user flows and state any known gaps/deviations
-- [x] Confirm each video plays and does not expose credentials or private test data
-
----
-
-## Sprint 1 Scope Demonstration
+### Sprint 1 recording
 
 - **File:** [sprint-1-product-demo.mov](sprint-1-product-demo.mov)
-- **Duration:** 59.99 seconds
-- **Format:** QuickTime MOV screen recording
-- **Recorded Date:** 31 October 2026 (retrospective demonstration; not recorded during the Sprint 1 dates)
-- **Demonstrated:** Student account registration, successful authenticated session, sign-out, and successful sign-in on the local application.
-- **Test identity:** A synthetic `example.test` student account; no personal credentials are shown.
+- **Duration/date:** 59.99 seconds; recorded 31 October 2026, retrospectively (not during Sprint 1)
+- **Visible scope:** registration succeeds; the success screen occupies much of the recording; it ends on a prefilled sign-in form without showing a completed login.
+- **Recording issue:** a persistent browser debugging banner is visible and distracts from the product.
+- **Privacy:** the visible registration uses a synthetic `example.test` identity.
 
-This recording demonstrates the Sprint 1 authentication scope. It is a retrospective recording and is not represented as footage captured during 19–23 October.
+The video proves registration only. Do not state it shows successful login/logout.
 
----
-
-## Sprint 2 Working Product Demonstration
+### Sprint 2 recording
 
 - **File:** [sprint-2-product-demo.mp4](sprint-2-product-demo.mp4)
-- **Duration:** 2 minutes (120 seconds, 2880 frames at 24 fps)
-- **Format:** H.264 MP4 (1280x720 progressive, yuv420p)
-- **File Size:** ~1.58 MB
-- **Demonstrator / Author:** Aditya Mandir (`adityamandir2005-pixel`)
-- **Recorded Date:** 30 October 2026
+- **Duration/date:** 2 minutes; recorded 30 October 2026
+- **Visible scope:** narrated/static slides describing architecture, authentication/roles, teacher quiz creation concepts, and the then-current test count.
+- **Limitations:** it does not show a live teacher-to-student quiz workflow; its “10/10 tests” and “FR3/FR4 carried forward” statements are historical and stale against current code. Some checklist glyphs render as empty squares.
 
-### Demonstrated User Flows & Verifications
+This is a historical Sprint 2 presentation, not proof of current working product flows. Do not edit the source recording to hide its date/scope; record a new final demo.
 
-1. **System Overview & Architecture Alignment (0:00 – 0:18):**
-   - Introduces the Online Quiz System, Sprint 2 objectives, and adherence to the submitted IEEE 3-Tier Architecture (React SPA + Express REST API + Prisma/SQLite relational database).
-2. **User Authentication & RBAC (0:18 – 0:40):**
-   - Demonstrates student and teacher authentication (FR1, SEC1) using bcrypt salted hashing and 15-minute JWT tokens.
-   - Shows role-based access control (SEC2): students are denied access to quiz authoring (HTTP 403 Forbidden), while teachers and administrators receive full authoring access.
-3. **Teacher Usability & Fast Onboarding (0:40 – 1:05):**
-   - Shows the in-app Quick Start Guide and live visual validators that allow teachers to master quiz creation in an average of 3.75 minutes (< 15-minute NFR3 ceiling).
-4. **Quiz Creation & Validation (1:05 – 1:30):**
-   - Demonstrates composing a quiz with title, instructions, and multiple-choice questions (FR2). Shows real-time option counts (`4 / 6 options ✓`) and answer matching validation (`✓ Matches option`).
-   - Verifies the `POST /api/quizzes` JSON payload and HTTP 201 Created response.
-5. **Quiz Management List & Automated Test Suite (1:30 – 1:50):**
-   - Verifies persistence in the relational database and immediate appearance in the **Teacher's Quiz Management List** (Test Case TC-03).
-   - Reviews the automated test suite with 10 passing tests in `app/api/test/auth.test.js`.
-6. **Sprint 2 Conclusion & Backlog Disposition (1:50 – 2:00):**
-   - Summarizes verified deliverables (FR1, FR2, SEC1, SEC2, NFR3, Demo Video) and records that student quiz taking (FR3) and automated grading (FR4) remain carried forward in the project backlog.
+## Current final demo still required
+
+- [ ] Record a clean end-to-end video on the current build; remove browser/debug overlays and use synthetic accounts/data.
+- [ ] Show a teacher signing in, creating a quiz, and publishing it.
+- [ ] Show a separate student signing in, selecting that teacher's quiz, answering, submitting, and receiving a score.
+- [ ] Show the server-enforced timer/no-answer-key behavior or explain it from the API/tests.
+- [ ] State known limitations: local SQLite vs PostgreSQL baseline; no hosted HTTPS proof; no grade-history/user-management features; historical GitHub PRs lack recorded reviewer submissions.
+- [ ] Upload the real capture here, document capture date/participants, and make sure no credentials/private information appear.
+
+## Suggested narration
+
+1. “This is the Online Quiz System. Students can register; teacher accounts are provisioned separately. Public registration creates student accounts only.”
+2. “Teachers create and publish multiple-choice quizzes with instructions and a duration.”
+3. “Students see active quizzes, start a timed attempt, and submit answers. The server owns the deadline and grading; the browser timer is only a display.”
+4. “The API returns the score without exposing correct answers. A submitted quiz cannot be retaken; an unfinished attempt can be resumed until expiry.”
+5. “Automated API tests and CI cover core routes. Local performance/load evidence has limits. Deployment HTTPS and full SRS grade-history/admin-user features remain gaps.”
+
+The current checkout does not contain a fresh capture, so this folder intentionally does not claim the final demo requirement is complete.

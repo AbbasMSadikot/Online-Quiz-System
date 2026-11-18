@@ -1,0 +1,20 @@
+@startuml
+title Sequence — teacher creates quiz (19 Nov 2026)
+actor Teacher
+participant "React Teacher Workspace" as UI
+participant "Express Quiz Router" as API
+participant "JWT / role middleware" as Auth
+participant "Prisma Client" as ORM
+database SQLite
+Teacher -> UI : Enter title, duration, instructions, questions
+UI -> API : POST /api/quizzes + Bearer JWT
+API -> Auth : Verify token and teacher/admin role
+Auth --> API : Authenticated principal
+API -> API : Validate quiz fields and options
+API -> ORM : Create quiz and question records
+ORM -> SQLite : Insert related rows
+SQLite --> ORM : Persisted records
+ORM --> API : Created quiz
+API --> UI : 201 Created + quiz data
+UI --> Teacher : Show quiz in management list
+@enduml

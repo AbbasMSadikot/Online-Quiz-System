@@ -28,10 +28,14 @@ try {
     data: { email: `nfr1-owner-${runId}@example.test`, passwordHash: "benchmark-only", role: "teacher" }
   });
   createdUserIds.push(owner.id);
-  const student = await prisma.user.create({
-    data: { email: `nfr1-student-${runId}@example.test`, passwordHash: "benchmark-only", role: "student" }
-  });
-  createdUserIds.push(student.id);
+  const students = [];
+  for (let index = 0; index < iterations + warmupCount; index += 1) {
+    const student = await prisma.user.create({
+      data: { email: `nfr1-student-${index}-${runId}@example.test`, passwordHash: "benchmark-only", role: "student" }
+    });
+    createdUserIds.push(student.id);
+    students.push(student);
+  }
 
   const quiz = await prisma.quiz.create({
     data: {
@@ -51,14 +55,15 @@ try {
   });
   quizId = quiz.id;
 
-  const token = jwt.sign(
+  const tokens = students.map(student => jwt.sign(
     { email: student.email, role: student.role },
     secret,
     { subject: String(student.id), expiresIn: "15m" }
-  );
+  ));
   const app = createApp({ prismaClient: prisma, jwtSecret: secret });
   const answers = quiz.questions.map(question => ({ questionId: question.id, answer: "A" }));
-  const submit = async () => {
+  const submit = async index => {
+    const token = tokens[index];
     const started = await request(app).post(`/api/quizzes/${quiz.id}/start`).set("Authorization", `Bearer ${token}`);
     if (started.status !== 201) throw new Error(`Could not start benchmark attempt (HTTP ${started.status}).`);
     return request(app)
@@ -68,7 +73,7 @@ try {
   };
 
   for (let index = 0; index < warmupCount; index += 1) {
-    const response = await submit();
+    const response = await submit(index);
     if (response.status !== 200 || response.body?.data?.result?.correct !== 10) {
       throw new Error(`Warm-up grading request failed with HTTP ${response.status}.`);
     }
@@ -77,7 +82,7 @@ try {
   const timings = [];
   for (let index = 0; index < iterations; index += 1) {
     const started = performance.now();
-    const response = await submit();
+    const response = await submit(warmupCount + index);
     const elapsedMs = performance.now() - started;
     if (response.status !== 200 || response.body?.data?.result?.correct !== 10) {
       throw new Error(`Measured grading request ${index + 1} failed with HTTP ${response.status}.`);

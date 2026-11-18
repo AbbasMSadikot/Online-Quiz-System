@@ -1,0 +1,28 @@
+@startuml
+title Online Quiz System — architecture (19 Nov 2026)
+skinparam componentStyle rectangle
+actor "Student / Teacher / Admin" as User
+node "Browser" {
+  component "React SPA (Vite)" as Web
+}
+node "Node.js process" {
+  component "Express REST API" as API
+  component "JWT auth middleware" as Auth
+  component "Auth routes" as AuthRoutes
+  component "Quiz routes: role checks, timing, grading" as QuizRoutes
+  component "Prisma Client" as Prisma
+}
+database "SQLite (configured local database)" as DB
+User --> Web
+Web --> API : JSON + Bearer JWT
+API --> Auth
+Auth --> AuthRoutes
+Auth --> QuizRoutes
+AuthRoutes --> Prisma
+QuizRoutes --> Prisma
+Prisma --> DB
+note bottom of DB
+Source schema uses SQLite. The submitted Test Plan names PostgreSQL;
+see DEV-01 in the deviation log.
+end note
+@enduml

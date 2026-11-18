@@ -1,0 +1,27 @@
+@startuml
+title Online Quiz System — components (19 Nov 2026)
+skinparam componentStyle rectangle
+package "app/web — React client" {
+  [Registration / Login UI] as LoginUI
+  [Student Quiz Workspace] as StudentUI
+  [Teacher Quiz Workspace] as TeacherUI
+  [Shared API client] as ApiClient
+}
+package "app/api — Express" {
+  [Auth Router] as AuthRouter
+  [Quiz Router] as QuizRouter
+  [JWT Auth Middleware] as Middleware
+  [Prisma Client] as ORM
+}
+database "SQLite: User, Quiz, Question, QuizAttempt" as DB
+LoginUI --> ApiClient
+StudentUI --> ApiClient
+TeacherUI --> ApiClient
+ApiClient --> AuthRouter : /api/auth/*
+ApiClient --> QuizRouter : /api/quizzes/*
+AuthRouter --> Middleware : protected /me
+QuizRouter --> Middleware : protected routes
+AuthRouter --> ORM
+QuizRouter --> ORM
+ORM --> DB
+@enduml

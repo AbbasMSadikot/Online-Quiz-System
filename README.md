@@ -20,6 +20,16 @@ A mini project for an online quiz system. The submitted Software Requirements Sp
 - `app/web/`: React web client.
 - `docs/`: the nine required submission and evidence areas.
 
+## How to present the project
+
+1. Explain the user problem: teachers publish multiple-choice quizzes; students take them within a time limit and receive an automatically calculated score.
+2. Walk through the three tiers: React/Vite browser client, Express REST API, and Prisma with SQLite. Authentication uses bcrypt password hashes and signed JWT bearer tokens; public registration creates student accounts. Teacher accounts are provisioned separately (for a local demo, run the seed command below).
+3. Demonstrate the real flow: teacher signs in and creates/activates a quiz; student signs in, chooses that quiz, answers, submits, and sees the result. Explain that the server enforces expiry and grading, and does not return the answer key.
+4. Explain verification precisely: 16 API tests, web build, and local grading benchmark passed on 19 November 2026. Recorded 500-client evidence uses one local process and SQLite, not a hosted production system.
+5. Disclose limitations: SQLite differs from the Test Plan's PostgreSQL environment; there is no deployed HTTPS proof, grade-history feature, or admin user-management feature. Historical sprint videos do not show the current full workflow. See the [RTM](docs/3-Requirements-Engineering/RTM.md) and [deviation log](docs/3-Requirements-Engineering/deviation-log.md).
+
+Avoid presenting a closed GitHub issue as a passed test or an unreviewed merged PR as owner approval. The live Project board also needs its story-point and two-sprint fields reconciled before showing it as final.
+
 ## FR1 implementation
 
 FR1 provides account registration and login using an email and password. The API normalizes email addresses, validates required fields, stores passwords as salted bcrypt hashes, and issues short-lived signed JWTs. The frontend keeps the token in memory for the current signed-in session. A protected `GET /api/auth/me` endpoint verifies the bearer token.
@@ -38,7 +48,9 @@ Students can browse quizzes teachers have made active, start an attempt, and ans
 
 The authenticated student endpoint `POST /api/quizzes/{quizId}/submit` accepts an `attemptId` and one answer for every quiz question. The deadline is calculated and enforced by the server; the browser countdown is only a display aid.
 
-The repeatable local NFR1 probe runs five warm-up workflows followed by 100 sequential timed quiz starts and submissions against a ten-question quiz. On 2 November 2026, p95 was 2.12 ms and maximum 2.25 ms, below the 2,000 ms threshold. This is a single-client local measurement; see the verification details and 500-client local exercise in [the FR3/NFR2 verification record](docs/7-Testing-Tools-and-Fixes/FR3-and-NFR2-verification-2026-11-02.md).
+The repeatable local NFR1 probe runs five warm-up workflows followed by 100 sequential timed quiz starts and submissions against a ten-question quiz. The 19 November 2026 run measured p50 1.72 ms, p95 2.15 ms, and maximum 2.37 ms, below the 2,000 ms threshold. This is a single-client local measurement; see the verification details and 500-client local exercise in [the FR3/NFR2 verification record](docs/7-Testing-Tools-and-Fixes/FR3-and-NFR2-verification-2026-11-02.md).
+
+After a student submits a quiz, the API rejects another attempt for that student and quiz with HTTP 409, matching Test Plan case TC-04. Starting the quiz creates an attempt; a student may resume that attempt until its server-side deadline, but cannot start a fresh attempt after submission.
 
 For a controlled local NFR2 exercise, run `npm run load-test:500 --workspace @online-quiz/api`. This creates synthetic local-only student accounts, starts up to 500 simultaneous quiz attempts, submits them concurrently, prints phase throughput/latency/errors, and removes its fixture data. Set `NFR2_CONCURRENCY` to a lower value for a smaller run. This harness does not test a deployed or multi-instance environment; record the environment and any failures before claiming the 500-user requirement is met.
 
@@ -80,7 +92,7 @@ npm run benchmark:grading --workspace @online-quiz/api
 NFR2_CONCURRENCY=500 npm run load-test:500 --workspace @online-quiz/api
 ```
 
-The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation, grading, validation rules, and role-based access control (RBAC). GitHub Actions runs API tests, the repeatable grading benchmark, and the web build on relevant pull requests.
+The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation, grading, validation rules, role-based access control (RBAC), server-side timing, and the no-retake rule. GitHub Actions runs API tests, the repeatable grading benchmark, and the web build on relevant pull requests.
 
 ## Backlog and sprint plan
 
@@ -98,4 +110,4 @@ The nine evidence folders map to the submission checklist:
 8. [Deployment and Environment](docs/8-Deployment-and-Environment/)
 9. [Demo](docs/9-Demo/)
 
-Current code implements FR1, FR2, FR3, and FR4 and includes a repeatable 500-concurrent-student harness for NFR2. The open backlog still tracks review/evidence for assigned items and deployed HTTPS verification; the local load run does not prove capacity in a production environment. The repository includes the [Sprint 1 scope demo](docs/9-Demo/sprint-1-product-demo.mov) and the [Sprint 2 product demo](docs/9-Demo/sprint-2-product-demo.mp4).
+Current code implements FR1–FR4 and includes a repeatable local 500-concurrent-student harness for NFR2. The local load run does not prove capacity in a production environment. GitHub backlog status, sprint fields, story points, and PR review records are maintained on GitHub and must be reported from the live board; the historical sprint demo videos document their actual recording dates and scope. The repository includes the [Sprint 1 retrospective demo](docs/9-Demo/sprint-1-product-demo.mov) and the [Sprint 2 retrospective demo](docs/9-Demo/sprint-2-product-demo.mp4). The Sprint 2 video predates the completed student attempt and grading workflow; record a current end-to-end demo before presenting the final build.

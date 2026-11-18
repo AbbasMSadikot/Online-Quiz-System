@@ -1,0 +1,36 @@
+@startuml
+title Online Quiz System — use cases (19 Nov 2026)
+left to right direction
+actor Student
+actor Teacher
+actor Administrator as Admin
+rectangle "Online Quiz System" {
+  usecase "Register / sign in" as Auth
+  usecase "Browse active quizzes" as Browse
+  usecase "Start and answer quiz" as Take
+  usecase "Submit and view score" as Score
+  usecase "Create and manage own quizzes" as Create
+  usecase "Activate / deactivate quiz" as Publish
+  usecase "Manage any quiz" as AdminQuiz
+  usecase "View grade history" as History
+  usecase "Manage users" as Users
+}
+Student --> Auth
+Student --> Browse
+Student --> Take
+Student --> Score
+Teacher --> Auth
+Teacher --> Create
+Teacher --> Publish
+Admin --> Auth
+Admin --> AdminQuiz
+Admin --> Publish
+AdminQuiz ..> Create : <<include>>
+History ..> Score : not implemented
+Users ..> Auth : not implemented
+note bottom
+Grade history and user management are in the submitted SRS scope but not
+implemented. This is source-authored PlantUML, not a MUL export.
+See GAP-04 and GAP-05 in the deviation log.
+end note
+@enduml

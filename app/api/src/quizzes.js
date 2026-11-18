@@ -86,6 +86,13 @@ export function createQuizRouter({ prisma, jwtSecret }) {
       });
       if (!quiz) return res.status(404).json({ success: false, error: { code: 404, message: "Quiz not found." } });
       if (!quiz.isActive) return res.status(404).json({ success: false, error: { code: 404, message: "This quiz is not currently available." } });
+      const priorAttempt = await prisma.quizAttempt.findFirst({
+        where: { quizId, studentId: req.auth.id, submittedAt: { not: null } },
+        select: { id: true }
+      });
+      if (priorAttempt) {
+        return res.status(409).json({ success: false, error: { code: 409, message: "You have already submitted this quiz. Retakes are not allowed." } });
+      }
       const startedAt = new Date();
       const expiresAt = new Date(startedAt.getTime() + quiz.durationMinutes * 60_000);
       const attempt = await prisma.quizAttempt.create({

@@ -4,10 +4,10 @@ The submitted baseline [Test Plan.pdf](Test%20Plan.pdf) is stored in this folder
 
 ## Evidence checklist
 
-- [ ] Test cases mapped to FR/NFR and acceptance criteria
+- [x] Test cases mapped to FR/NFR and acceptance criteria (see [execution and traceability record](execution-and-traceability.md))
 - [x] Environment, tools, test data, and repeatable API steps documented in the source tests and README
 - [x] Automated API tests and CI results recorded in [Testing Tools and Fixes](../7-Testing-Tools-and-Fixes/)
-- [x] Security (SEC2) and usability (NFR3) evidence completed and recorded in [Testing Tools and Fixes](../7-Testing-Tools-and-Fixes/); performance (NFR1) and concurrency (NFR2) remain pending implementation
-- [ ] Full test-plan execution record with tester, pass/fail, and artifact links
+- [x] Security (SEC2), usability (NFR3), performance (NFR1), and local concurrency (NFR2) evidence recorded in [Testing Tools and Fixes](../7-Testing-Tools-and-Fixes/); read each record's limitations
+- [x] Test-plan mapping and known execution limits recorded in [execution and traceability record](execution-and-traceability.md)
 
-The API tests cover authentication, quiz creation, and role authorization. NFR3 teacher quiz creation usability is evaluated and documented. Grading performance remains blocked until FR3/FR4 are implemented; see the [NFR1 assessment](../7-Testing-Tools-and-Fixes/NFR1-performance-assessment-2026-10-30.md).
+The submitted PDF is preserved as the baseline. Current code implements FR3 and FR4. TC-04's post-submission no-retake rule is enforced by the API and its regression test passed in the 19 November 2026 API run. The execution record distinguishes this local run from historical CI and deployment evidence.
