@@ -13,6 +13,21 @@ async function main() {
     }
   });
   console.log(`Provisioned teacher account: ${teacher.email} (role: ${teacher.role})`);
+
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (adminEmail || adminPassword) {
+    if (!adminEmail || !adminPassword || adminPassword.length < 8 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) {
+      throw new Error("Set both ADMIN_EMAIL and an ADMIN_PASSWORD of at least 8 characters to provision an administrator.");
+    }
+    const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
+    const admin = await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: { role: "admin" },
+      create: { email: adminEmail, passwordHash: adminPasswordHash, role: "admin" }
+    });
+    console.log(`Provisioned administrator account: ${admin.email} (role: ${admin.role})`);
+  }
 }
 
 main()

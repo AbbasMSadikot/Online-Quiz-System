@@ -17,14 +17,20 @@ export default function App() {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [quizResult, setQuizResult] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
+  const [gradeHistory, setGradeHistory] = useState([]);
+  const [adminUsers, setAdminUsers] = useState([]);
 
   const canCreateQuiz = session && ["teacher", "admin"].includes(session.user.role);
 
   useEffect(() => {
     if (session?.token) {
       loadQuizzes();
+      if (session.user.role === "student") loadGradeHistory();
+      if (session.user.role === "admin") loadAdminUsers();
     } else {
       setQuizzes([]);
+      setGradeHistory([]);
+      setAdminUsers([]);
     }
   }, [session, canCreateQuiz]);
 
@@ -57,6 +63,46 @@ export default function App() {
       }
     } catch {
       // quiet fail
+    }
+  }
+
+  async function loadGradeHistory() {
+    try {
+      const response = await fetch("/api/quizzes/results", { headers: { Authorization: `Bearer ${session.token}` } });
+      const body = await response.json();
+      if (response.ok && body.success) setGradeHistory(body.data.results ?? []);
+    } catch {
+      setGradeHistory([]);
+    }
+  }
+
+  async function loadAdminUsers() {
+    try {
+      const response = await fetch("/api/admin/users", { headers: { Authorization: `Bearer ${session.token}` } });
+      const body = await response.json();
+      if (response.ok && body.success) setAdminUsers(body.data.users ?? []);
+    } catch {
+      setAdminUsers([]);
+    }
+  }
+
+  async function changeUserRole(user, role) {
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}/role`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+        body: JSON.stringify({ role })
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error?.message ?? "Could not update this user's role.");
+      await loadAdminUsers();
+      setMessage(`${user.email} is now a ${role}.`);
+    } catch (error) {
+      setMessage(error.message || "Could not reach the server.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -194,6 +240,7 @@ export default function App() {
       if (!response.ok) throw new Error(body.error?.message ?? "Could not submit this quiz.");
       setQuizResult(body.data.result);
       setActiveAttempt(null);
+      await loadGradeHistory();
       setMessage("Quiz submitted successfully.");
     } catch (error) {
       setMessage(error.message || "Could not reach the server.");
@@ -288,6 +335,7 @@ export default function App() {
                       {message && <p className="notice" role="status">{message}</p>}
                     </section>
                   )}
+                  <GradeHistory results={gradeHistory} />
                 </div>
               ) : (
                 <>
@@ -387,6 +435,27 @@ export default function App() {
                       </div>
                     )}
                   </section>
+                  {session.user.role === "admin" && (
+                    <section className="quiz-management" aria-labelledby="admin-users-heading">
+                      <h3 id="admin-users-heading">User management</h3>
+                      {adminUsers.length === 0 ? <p className="field-hint">No user accounts found.</p> : (
+                        <div className="quiz-list">
+                          {adminUsers.map(user => (
+                            <div className="quiz-item" key={user.id}>
+                              <div className="quiz-item-header"><strong><SafeText value={user.email} /></strong><span><SafeText value={user.role} /></span></div>
+                              {user.role !== "admin" && (
+                                <button className="text-button" type="button" disabled={busy}
+                                  onClick={() => changeUserRole(user, user.role === "student" ? "teacher" : "student")}>
+                                  Make {user.role === "student" ? "teacher" : "student"}
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {message && <p className="notice" role="status">{message}</p>}
+                    </section>
+                  )}
                 </>
               )}
             </>
@@ -412,5 +481,23 @@ export default function App() {
       </section>
       <footer><span>© 2026 Quizspace</span><span>Learning, one question at a time.</span></footer>
     </main>
+  );
+}
+
+function GradeHistory({ results }) {
+  return (
+    <section className="quiz-management" aria-labelledby="grade-history-heading">
+      <h3 id="grade-history-heading">Grade history</h3>
+      {results.length === 0 ? <p className="field-hint">Submitted quiz scores will appear here.</p> : (
+        <div className="quiz-list">
+          {results.map(result => (
+            <div className="quiz-item" key={result.attemptId}>
+              <div className="quiz-item-header"><strong><SafeText value={result.quizTitle} /></strong><span>{result.correct}/{result.total} ({result.percentage}%)</span></div>
+              <p className="field-hint">Submitted {new Date(result.submittedAt).toLocaleString()}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

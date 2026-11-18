@@ -23,10 +23,10 @@ A mini project for an online quiz system. The submitted Software Requirements Sp
 ## How to present the project
 
 1. Explain the user problem: teachers publish multiple-choice quizzes; students take them within a time limit and receive an automatically calculated score.
-2. Walk through the three tiers: React/Vite browser client, Express REST API, and Prisma with SQLite. Authentication uses bcrypt password hashes and signed JWT bearer tokens; public registration creates student accounts. Teacher accounts are provisioned separately (for a local demo, run the seed command below).
+2. Walk through the three tiers: React/Vite browser client, Express REST API, and Prisma with SQLite. Authentication uses bcrypt password hashes and signed JWT bearer tokens; public registration creates student accounts. Teacher accounts are provisioned separately. Admins can manage student/teacher roles; provision an admin using private environment variables before seeding.
 3. Demonstrate the real flow: teacher signs in and creates/activates a quiz; student signs in, chooses that quiz, answers, submits, and sees the result. Explain that the server enforces expiry and grading, and does not return the answer key.
-4. Explain verification precisely: 17 API tests, one focused web XSS rendering test, the web build, and local grading benchmark passed on 19 November 2026. Recorded 500-client evidence uses one local process and SQLite, not a hosted production system.
-5. Disclose limitations: SQLite differs from the Test Plan's PostgreSQL environment; there is no deployed HTTPS proof, grade-history feature, or admin user-management feature. Historical sprint videos do not show the current full workflow. See the [RTM](docs/3-Requirements-Engineering/RTM.md) and [deviation log](docs/3-Requirements-Engineering/deviation-log.md).
+4. Explain verification precisely: the 19 November local run passed 19 API tests, one focused web XSS rendering test, the web build, and the grading benchmark. Recorded 500-client evidence uses one local process and SQLite, not a hosted production system.
+5. Disclose limitations: SQLite differs from the Test Plan's PostgreSQL environment and there is no deployed HTTPS proof. Historical sprint videos do not show the current full workflow. See the [RTM](docs/3-Requirements-Engineering/RTM.md) and [deviation log](docs/3-Requirements-Engineering/deviation-log.md).
 
 Avoid presenting a closed GitHub issue as a passed test or an unreviewed merged PR as owner approval. The live Project board also needs its story-point and two-sprint fields reconciled before showing it as final.
 
@@ -48,9 +48,11 @@ Students can browse quizzes teachers have made active, start an attempt, and ans
 
 The authenticated student endpoint `POST /api/quizzes/{quizId}/submit` accepts an `attemptId` and one answer for every quiz question. The deadline is calculated and enforced by the server; the browser countdown is only a display aid.
 
-The repeatable local NFR1 probe runs five warm-up workflows followed by 100 sequential timed quiz starts and submissions against a ten-question quiz. The 19 November 2026 run measured p50 1.76 ms, p95 2.17 ms, and maximum 2.19 ms, below the 2,000 ms threshold. This is a single-client local measurement; see the verification details and 500-client local exercise in [the FR3/NFR2 verification record](docs/7-Testing-Tools-and-Fixes/FR3-and-NFR2-verification-2026-11-02.md).
+The repeatable local NFR1 probe runs five warm-up workflows followed by 100 sequential timed quiz starts and submissions against a ten-question quiz. The latest 19 November 2026 run measured p50 1.88 ms, p95 2.27 ms, and maximum 2.52 ms, below the 2,000 ms threshold. This is a single-client local measurement; see the verification details and 500-client local exercise in [the FR3/NFR2 verification record](docs/7-Testing-Tools-and-Fixes/FR3-and-NFR2-verification-2026-11-02.md).
 
 After a student submits a quiz, the API rejects another attempt for that student and quiz with HTTP 409, matching Test Plan case TC-04. Starting the quiz creates an attempt; a student may resume that attempt until its server-side deadline, but cannot start a fresh attempt after submission.
+
+Students can view their submitted score history from the student workspace. Administrators can list accounts and change student/teacher roles from the admin workspace. Public registration cannot create admins; seed an admin using private `ADMIN_EMAIL` and `ADMIN_PASSWORD` environment values. Authenticated API requests check the current role in the database so role changes immediately affect existing tokens.
 
 For a controlled local NFR2 exercise, run `npm run load-test:500 --workspace @online-quiz/api`. This creates synthetic local-only student accounts, starts up to 500 simultaneous quiz attempts, submits them concurrently, prints phase throughput/latency/errors, and removes its fixture data. Set `NFR2_CONCURRENCY` to a lower value for a smaller run. This harness does not test a deployed or multi-instance environment; record the environment and any failures before claiming the 500-user requirement is met.
 
@@ -75,6 +77,8 @@ Requirements: Node.js 22 or newer and npm.
 
    Default credentials: `teacher@example.com` / `Teacher123!`.
 
+   To provision an administrator, set private `ADMIN_EMAIL` and `ADMIN_PASSWORD` values in `app/api/.env` before running the seed command. Public registration cannot create an admin account. Never commit these credentials.
+
 5. In one terminal, start the API: `npm run dev:api`.
 6. In another terminal, start the web client: `npm run dev:web`.
 7. Open the Vite URL shown in the terminal (normally `http://localhost:5173`).
@@ -94,7 +98,7 @@ npm run benchmark:grading --workspace @online-quiz/api
 NFR2_CONCURRENCY=500 npm run load-test:500 --workspace @online-quiz/api
 ```
 
-The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation, grading, validation rules, role-based access control (RBAC), server-side timing, no-retake behavior, and a SQL-injection-shaped invalid ID. A web test verifies hostile quiz text renders escaped via React. GitHub Actions runs API tests, the repeatable grading benchmark, the web test, and the web build on relevant pull requests.
+The API test suite covers registration, email normalization, required-field validation, duplicate registration, valid and invalid login, bcrypt password storage, bearer-token authentication, teacher quiz creation, grading, validation rules, role-based access control (RBAC), server-side timing, no-retake behavior, grade history, admin user management, and a SQL-injection-shaped invalid ID. A web test verifies hostile quiz text renders escaped via React. GitHub Actions runs API tests, the repeatable grading benchmark, the web test, and the web build on relevant pull requests.
 
 ## Backlog and sprint plan
 

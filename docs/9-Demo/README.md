@@ -29,7 +29,7 @@ This is a historical Sprint 2 presentation, not proof of current working product
 - [ ] Show a teacher signing in, creating a quiz, and publishing it.
 - [ ] Show a separate student signing in, selecting that teacher's quiz, answering, submitting, and receiving a score.
 - [ ] Show the server-enforced timer/no-answer-key behavior or explain it from the API/tests.
-- [ ] State known limitations: local SQLite vs PostgreSQL baseline; no hosted HTTPS proof; no grade-history/user-management features; historical GitHub PRs lack recorded reviewer submissions.
+- [ ] State known limitations: local SQLite vs PostgreSQL baseline; no hosted HTTPS proof; historical GitHub PRs lack recorded reviewer submissions.
 - [ ] Upload the real capture here, document capture date/participants, and make sure no credentials/private information appear.
 
 ## Suggested narration

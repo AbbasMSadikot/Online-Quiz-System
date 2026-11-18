@@ -7,7 +7,10 @@ Base path: `/api`. Successful responses use `{ success, data }`; errors use `{ s
 | `POST /auth/register` | Public; creates student | Register email/password |
 | `POST /auth/login` | Public | Authenticate and receive token |
 | `GET /auth/me` | Authenticated | Return current principal |
+| `GET /admin/users` | Admin | List user ID/email/role/creation date; excludes password hashes |
+| `PATCH /admin/users/{userId}/role` | Admin | Change a student/teacher role; cannot assign admin or change own role |
 | `GET /quizzes` | Student / teacher / admin | Student: active summaries; teacher: owned quizzes; admin: all quizzes |
+| `GET /quizzes/results` | Student | List that student's submitted scores, newest first; no answer keys |
 | `POST /quizzes` | Teacher / admin | Create quiz and questions; `201` |
 | `PATCH /quizzes/{quizId}/active` | Owner teacher / admin | Activate/deactivate quiz |
 | `POST /quizzes/{quizId}/start` | Student | Create timed attempt and return options without answer key; `409` after a submitted attempt |

@@ -8,7 +8,7 @@
     "start": "node --env-file=.env src/server.js",
     "db:generate": "prisma generate --schema prisma/schema.prisma",
     "db:push": "prisma db push --schema prisma/schema.prisma",
-    "db:seed": "node src/seed.js",
+    "db:seed": "node --env-file=.env src/seed.js",
     "verify:tls": "node scripts/verify-tls.mjs",
     "benchmark:grading": "node --env-file=.env.test scripts/benchmark-grading.mjs",
     "load-test:500": "node --env-file=.env.test scripts/load-test-500.mjs",

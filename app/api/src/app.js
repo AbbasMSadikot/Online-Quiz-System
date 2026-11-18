@@ -4,6 +4,7 @@ import rateLimit from "express-rate-limit";
 import { prisma } from "./db.js";
 import { createAuthRouter, createRequireAuth } from "./auth.js";
 import { createQuizRouter } from "./quizzes.js";
+import { createAdminRouter } from "./admin.js";
 
 export function createApp({
   prismaClient = prisma,
@@ -24,9 +25,10 @@ export function createApp({
     legacyHeaders: false
   }));
   app.use("/api/auth", createAuthRouter({ prisma: prismaClient, jwtSecret }));
+  app.use("/api/admin", createAdminRouter({ prisma: prismaClient, jwtSecret }));
   app.use("/api/quizzes", createQuizRouter({ prisma: prismaClient, jwtSecret }));
 
-  app.get("/api/auth/me", createRequireAuth(jwtSecret), async (req, res, next) => {
+  app.get("/api/auth/me", createRequireAuth(jwtSecret, prismaClient), async (req, res, next) => {
     try {
       const user = await prismaClient.user.findUnique({
         where: { id: req.auth.id },

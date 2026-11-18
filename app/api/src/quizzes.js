@@ -72,7 +72,32 @@ function studentOnly(req, res) {
 
 export function createQuizRouter({ prisma, jwtSecret }) {
   const router = Router();
-  const requireAuth = createRequireAuth(jwtSecret);
+  const requireAuth = createRequireAuth(jwtSecret, prisma);
+
+  router.get("/results", requireAuth, async (req, res, next) => {
+    if (!studentOnly(req, res)) return;
+    try {
+      const attempts = await prisma.quizAttempt.findMany({
+        where: { studentId: req.auth.id, submittedAt: { not: null } },
+        orderBy: { submittedAt: "desc" },
+        select: {
+          id: true, quizId: true, submittedAt: true, correct: true, total: true,
+          quiz: { select: { title: true } }
+        }
+      });
+      return res.json({ success: true, data: { results: attempts.map(attempt => ({
+        attemptId: attempt.id,
+        quizId: attempt.quizId,
+        quizTitle: attempt.quiz.title,
+        submittedAt: attempt.submittedAt,
+        correct: attempt.correct,
+        total: attempt.total,
+        percentage: Math.round((attempt.correct / attempt.total) * 100)
+      })) } });
+    } catch (error) {
+      return next(error);
+    }
+  });
 
   router.post("/:quizId/start", requireAuth, async (req, res, next) => {
     if (!studentOnly(req, res)) return;

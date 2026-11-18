@@ -111,3 +111,32 @@ test("prevents a student from starting the same quiz more than once", async () =
   assert.equal(await prisma.quizAttempt.count({ where: { quizId: quiz.id } }), 1);
   assert.ok(first.id);
 });
+
+test("students can view their submitted grade history but teachers cannot", async () => {
+  const { quiz, token } = await createFixture();
+  const attempt = await startAttempt(quiz.id, token);
+  const answers = quiz.questions.map(question => ({ questionId: question.id, answer: "A" }));
+  const submission = await request(app).post(`/api/quizzes/${quiz.id}/submit`)
+    .set("Authorization", `Bearer ${token}`).send({ attemptId: attempt.id, answers });
+  assert.equal(submission.status, 200);
+
+  const history = await request(app).get("/api/quizzes/results").set("Authorization", `Bearer ${token}`);
+  assert.equal(history.status, 200);
+  assert.equal(history.body.data.results.length, 1);
+  assert.deepEqual(history.body.data.results[0], {
+    attemptId: attempt.id,
+    quizId: quiz.id,
+    quizTitle: quiz.title,
+    submittedAt: submission.body.data.result.submittedAt,
+    correct: 1,
+    total: 2,
+    percentage: 50
+  });
+  assert.equal(JSON.stringify(history.body).includes("correctAnswer"), false);
+
+  const teacher = await request(app).post("/api/auth/login")
+    .send({ email: "teacher@example.com", password: "correct horse battery" });
+  const forbidden = await request(app).get("/api/quizzes/results")
+    .set("Authorization", `Bearer ${teacher.body.data.token}`);
+  assert.equal(forbidden.status, 403);
+});

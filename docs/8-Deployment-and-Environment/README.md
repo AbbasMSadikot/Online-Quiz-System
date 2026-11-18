@@ -26,10 +26,11 @@ From the repository root:
    ```
 
 4. For an HTTPS deployment, set `TLS_CERT_FILE` and `TLS_KEY_FILE` to the certificate and key paths. The Node HTTPS server enforces TLS 1.2 as its minimum protocol.
-5. Start the API in one terminal: `npm run dev:api`. The API scripts load `app/api/.env` automatically.
-6. Start the web client in another terminal: `npm run dev:web`.
-7. Verify a deployed endpoint with `TLS_CHECK_URL=https://your-host.example.com npm run verify:tls --workspace @online-quiz/api`.
-8. Open the Vite URL shown in the terminal, normally `http://localhost:5173`. Complete a registration/login flow to check the API and database together.
+5. To provision a development administrator, set private `ADMIN_EMAIL` and `ADMIN_PASSWORD` values in `app/api/.env`, then run `npm run db:seed --workspace @online-quiz/api`. The seed command provisions the teacher demo account too. Public registration cannot create administrators; do not commit these credentials.
+6. Start the API in one terminal: `npm run dev:api`. The API scripts load `app/api/.env` automatically.
+7. Start the web client in another terminal: `npm run dev:web`.
+8. Verify a deployed endpoint with `TLS_CHECK_URL=https://your-host.example.com npm run verify:tls --workspace @online-quiz/api`.
+9. Open the Vite URL shown in the terminal, normally `http://localhost:5173`. Complete registration/login and student/teacher/admin flows to check the API and database together.
 
 The local database is created from the `DATABASE_URL` in `app/api/.env`; the example points to a SQLite file managed by Prisma. Tests use the separate `app/api/.env.test` configuration and test database.
 

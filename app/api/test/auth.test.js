@@ -116,6 +116,46 @@ test("rejects SQL-injection-shaped quiz IDs as invalid input", async () => {
   assert.equal(response.body.success, false);
 });
 
+test("restricts user management to admins and allows safe student/teacher role changes", async () => {
+  const passwordHash = await bcrypt.hash("correct horse battery", 4);
+  const admin = await prisma.user.create({ data: { email: "admin@example.com", passwordHash, role: "admin" } });
+  const student = await prisma.user.create({ data: { email: "managed@example.com", passwordHash, role: "student" } });
+  const adminLogin = await request(app).post("/api/auth/login").send({ email: admin.email, password: "correct horse battery" });
+  const studentLogin = await request(app).post("/api/auth/login").send({ email: student.email, password: "correct horse battery" });
+  const adminToken = adminLogin.body.data.token;
+
+  const forbidden = await request(app).get("/api/admin/users").set("Authorization", `Bearer ${studentLogin.body.data.token}`);
+  assert.equal(forbidden.status, 403);
+  const unauthenticated = await request(app).get("/api/admin/users");
+  assert.equal(unauthenticated.status, 401);
+
+  const listed = await request(app).get("/api/admin/users").set("Authorization", `Bearer ${adminToken}`);
+  assert.equal(listed.status, 200);
+  assert.equal(listed.body.data.users.some(user => "passwordHash" in user), false);
+
+  const changed = await request(app).patch(`/api/admin/users/${student.id}/role`)
+    .set("Authorization", `Bearer ${adminToken}`).send({ role: "teacher" });
+  assert.equal(changed.status, 200);
+  assert.equal(changed.body.data.user.role, "teacher");
+
+  const selfChange = await request(app).patch(`/api/admin/users/${admin.id}/role`)
+    .set("Authorization", `Bearer ${adminToken}`).send({ role: "teacher" });
+  assert.equal(selfChange.status, 409);
+  const invalidRole = await request(app).patch(`/api/admin/users/${student.id}/role`)
+    .set("Authorization", `Bearer ${adminToken}`).send({ role: "admin" });
+  assert.equal(invalidRole.status, 400);
+
+  const teacher = await prisma.user.create({ data: { email: "demotable@example.com", passwordHash, role: "teacher" } });
+  const teacherLogin = await request(app).post("/api/auth/login")
+    .send({ email: teacher.email, password: "correct horse battery" });
+  const demoted = await request(app).patch(`/api/admin/users/${teacher.id}/role`)
+    .set("Authorization", `Bearer ${adminToken}`).send({ role: "student" });
+  assert.equal(demoted.status, 200);
+  const staleTeacherToken = await request(app).post("/api/quizzes")
+    .set("Authorization", `Bearer ${teacherLogin.body.data.token}`).send({});
+  assert.equal(staleTeacherToken.status, 403);
+});
+
 test("lists available quizzes to students without revealing answer keys", async () => {
   const passwordHash = await bcrypt.hash("correct horse battery", 4);
   const teacher = await prisma.user.create({ data: { email: "quiz-owner@example.com", passwordHash, role: "teacher" } });

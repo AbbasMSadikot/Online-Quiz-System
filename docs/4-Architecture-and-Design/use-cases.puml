@@ -9,28 +9,27 @@ rectangle "Online Quiz System" {
   usecase "Browse active quizzes" as Browse
   usecase "Start and answer quiz" as Take
   usecase "Submit and view score" as Score
+  usecase "View grade history" as History
   usecase "Create and manage own quizzes" as Create
   usecase "Activate / deactivate quiz" as Publish
   usecase "Manage any quiz" as AdminQuiz
-  usecase "View grade history" as History
-  usecase "Manage users" as Users
+  usecase "Manage student/teacher users" as Users
 }
 Student --> Auth
 Student --> Browse
 Student --> Take
 Student --> Score
+Student --> History
 Teacher --> Auth
 Teacher --> Create
 Teacher --> Publish
 Admin --> Auth
 Admin --> AdminQuiz
 Admin --> Publish
+Admin --> Users
 AdminQuiz ..> Create : <<include>>
-History ..> Score : not implemented
-Users ..> Auth : not implemented
 note bottom
-Grade history and user management are in the submitted SRS scope but not
-implemented. This is source-authored PlantUML, not a MUL export.
-See GAP-04 and GAP-05 in the deviation log.
+Grade history and admin user/role management are implemented in the current source.
+This is source-authored PlantUML, not a MUL export. See GAP-05 in the deviation log.
 end note
 @enduml

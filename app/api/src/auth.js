@@ -83,8 +83,8 @@ export function createAuthRouter({ prisma, jwtSecret }) {
   return router;
 }
 
-export function createRequireAuth(jwtSecret) {
-  return (req, res, next) => {
+export function createRequireAuth(jwtSecret, prisma) {
+  return async (req, res, next) => {
     const header = req.get("authorization") ?? "";
     const [scheme, token] = header.split(" ");
     if (scheme !== "Bearer" || !token) {
@@ -94,15 +94,29 @@ export function createRequireAuth(jwtSecret) {
       });
     }
 
+    let claims;
     try {
-      const claims = jwt.verify(token, jwtSecret);
-      req.auth = { id: Number(claims.sub), email: claims.email, role: claims.role };
-      return next();
+      claims = jwt.verify(token, jwtSecret);
     } catch {
       return res.status(401).json({
         success: false,
         error: { code: 401, message: "The token is invalid or expired." }
       });
+    }
+
+    try {
+      const userId = Number(claims.sub);
+      if (!Number.isInteger(userId) || userId < 1) {
+        return res.status(401).json({ success: false, error: { code: 401, message: "The token is invalid or expired." } });
+      }
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, email: true, role: true } });
+      if (!user) {
+        return res.status(401).json({ success: false, error: { code: 401, message: "The account for this token no longer exists." } });
+      }
+      req.auth = user;
+      return next();
+    } catch (error) {
+      return next(error);
     }
   };
 }
