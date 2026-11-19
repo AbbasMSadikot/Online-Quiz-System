@@ -92,7 +92,7 @@ flowchart LR
   adminRoutes --> data
 ```
 
-Public account registration always creates a `student`. A teacher account is provisioned separately with the seed command or promoted by an administrator. The API reads the current role from the database on each authenticated request, so a changed role takes effect even when an older token is still held by the browser. A student cannot create or manage quizzes; a teacher can create and manage their own quizzes but cannot access grade-history or admin-user endpoints.
+Public account registration always creates a `student`. The demo teacher is provisioned by `npm run db:seed --workspace @online-quiz/api`, which upserts `teacher@example.com` with the documented demo password and teacher role; an administrator can also promote a registered account. The API reads the current role from the database on each authenticated request, so a changed role takes effect even when an older token is still held by the browser. The browser workspace role is read when logging in, so sign out and sign in again after a role change. A student cannot create or manage quizzes; a teacher can create and manage their own quizzes but cannot access grade-history or admin-user endpoints.
 
 ## Randomized quiz presentation
 

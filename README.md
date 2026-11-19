@@ -78,6 +78,7 @@ Requirements: Node.js 22 or newer and npm.
    ```
 
    Default credentials: `teacher@example.com` / `Teacher123!`.
+   The seed upserts this demo account as a teacher and resets its password to the demo password, so it also repairs an existing `teacher@example.com` account that was previously registered as a student.
 
    To provision an administrator, set private `ADMIN_EMAIL` and `ADMIN_PASSWORD` values in `app/api/.env` before running the seed command. Public registration cannot create an admin account. Never commit these credentials.
 
