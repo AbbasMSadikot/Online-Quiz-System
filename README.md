@@ -25,7 +25,7 @@ A mini project for an online quiz system. The submitted Software Requirements Sp
 1. Explain the user problem: teachers publish multiple-choice quizzes; students take them within a time limit and receive an automatically calculated score.
 2. Walk through the three tiers: React/Vite browser client, Express REST API, and Prisma with SQLite. Authentication uses bcrypt password hashes and signed JWT bearer tokens; public registration creates student accounts. Teacher accounts are provisioned separately. Admins can manage student/teacher roles; provision an admin using private environment variables before seeding.
 3. Demonstrate the real flow: teacher signs in and creates/activates a quiz; student signs in, chooses that quiz, answers, submits, and sees the result. Explain that the server enforces expiry and grading, and does not return the answer key.
-4. Explain verification precisely: the 19 November local run passed 19 API tests, one focused web XSS rendering test, the web build, and the grading benchmark. Recorded 500-client evidence uses one local process and SQLite, not a hosted production system.
+4. Explain verification precisely: the 19 November local run passed 21 API tests, one focused web XSS rendering test, and the web build. Recorded 500-client evidence uses one local process and SQLite, not a hosted production system.
 5. Disclose limitations: SQLite differs from the Test Plan's PostgreSQL environment and there is no deployed HTTPS proof. Historical sprint videos do not show the current full workflow. See the [RTM](docs/3-Requirements-Engineering/RTM.md) and [deviation log](docs/3-Requirements-Engineering/deviation-log.md).
 
 Avoid presenting a closed GitHub issue as a passed test or an unreviewed merged PR as owner approval. The live Project board also needs its story-point and two-sprint fields reconciled before showing it as final.
@@ -45,6 +45,8 @@ To satisfy NFR3 (usability), the workspace incorporates an in-app Quick Start Gu
 ## FR4 automatic grading and NFR1 performance
 
 Students can browse quizzes teachers have made active, start an attempt, and answer the displayed multiple-choice questions. Teachers can hide and republish quizzes and set a whole-number time limit from 1 to 180 minutes (10 minutes by default). The API stores each attempt and its deadline, rejects late or duplicate submissions, and returns a score without exposing the answer key. Automated tests cover the student list, answer-key privacy, timing, availability, and invalid submissions.
+
+Each quiz start gets an independent cryptographically secure shuffle of its questions and the options within each question. The API keeps each question ID and option text attached to its shuffled display, so grading remains correct. This changes display order per attempt while leaving the teacher's saved quiz order untouched.
 
 The authenticated student endpoint `POST /api/quizzes/{quizId}/submit` accepts an `attemptId` and one answer for every quiz question. The deadline is calculated and enforced by the server; the browser countdown is only a display aid.
 

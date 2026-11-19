@@ -96,8 +96,9 @@ sequenceDiagram
   A->>P: Create attempt and server deadline
   P->>D: Persist attempt
   D-->>P: Persisted attempt
-  P-->>A: Questions/options and attempt data
-  A-->>W: Questions/options, attempt ID, expiry
+  P-->>A: Stored questions/options and attempt data
+  A->>A: Cryptographically shuffle question and option order
+  A-->>W: Shuffled questions/options, stable IDs, attempt ID, expiry (no answer key)
   S->>W: Answer and submit
   W->>A: POST /api/quizzes/{id}/submit
   A->>M: Verify token/current student role
@@ -125,6 +126,7 @@ sequenceDiagram
   participant W as React admin workspace
   participant A as Express admin API
   participant M as JWT/current-role middleware
+  participant P as Prisma
   participant D as SQLite
   U->>W: Open User Management
   W->>A: GET /api/admin/users
@@ -147,3 +149,5 @@ sequenceDiagram
 ```
 
 For deviations and unimplemented deployment evidence, see the [RTM and deviation log](../3-Requirements-Engineering/).
+
+For a versioned hardware/software inventory, detailed deployment topology, role trust boundaries, and configuration notes, see the [detailed architecture and environment](deployment-architecture.md).

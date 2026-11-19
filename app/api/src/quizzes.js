@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createRequireAuth } from "./auth.js";
+import { shuffled } from "./randomize.js";
 
 const TITLE_MAX_LENGTH = 120;
 const INSTRUCTIONS_MAX_LENGTH = 2000;
@@ -125,7 +126,13 @@ export function createQuizRouter({ prisma, jwtSecret }) {
       });
       return res.status(201).json({ success: true, data: {
         attempt: { id: attempt.id, startedAt, expiresAt },
-        quiz: { ...quiz, questions: quiz.questions.map(question => ({ ...question, options: JSON.parse(question.optionsJson) })) }
+        // Shuffle only the attempt response; IDs and answer text remain stable so
+        // submissions can be graded safely against the stored answer key.
+        quiz: { ...quiz, questions: shuffled(quiz.questions).map(question => ({
+          id: question.id,
+          prompt: question.prompt,
+          options: shuffled(JSON.parse(question.optionsJson))
+        })) }
       } });
     } catch (error) {
       return next(error);

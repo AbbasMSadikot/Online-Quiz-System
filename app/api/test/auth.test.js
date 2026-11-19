@@ -35,6 +35,7 @@ test("creates a quiz with its multiple-choice questions for an authorized teache
   const login = await request(app).post("/api/auth/login")
     .send({ email: teacher.email, password: "correct horse battery" });
   assert.equal(login.status, 200);
+  assert.equal(login.body.data.user.role, "teacher");
 
   const response = await request(app)
     .post("/api/quizzes")
@@ -162,17 +163,28 @@ test("lists available quizzes to students without revealing answer keys", async 
   const student = await prisma.user.create({ data: { email: "quiz-taker@example.com", passwordHash, role: "student" } });
   const quiz = await prisma.quiz.create({ data: {
     title: "Take me", instructions: "Select one answer.", durationMinutes: 7, ownerId: teacher.id,
-    questions: { create: [{ position: 1, prompt: "Pick A", optionsJson: JSON.stringify(["A", "B"]), correctAnswer: "A" }] }
+    questions: { create: [
+      { position: 1, prompt: "Pick A", optionsJson: JSON.stringify(["A", "B"]), correctAnswer: "A" },
+      { position: 2, prompt: "Pick C", optionsJson: JSON.stringify(["C", "D", "E"]), correctAnswer: "D" }
+    ] }
   } });
+  const storedQuestions = await prisma.question.findMany({ where: { quizId: quiz.id } });
   const login = await request(app).post("/api/auth/login").send({ email: student.email, password: "correct horse battery" });
+  assert.equal(login.body.data.user.role, "student");
   const response = await request(app).get("/api/quizzes").set("Authorization", `Bearer ${login.body.data.token}`);
   assert.equal(response.status, 200);
-  assert.deepEqual(response.body.data.quizzes, [{ id: quiz.id, title: "Take me", instructions: "Select one answer.", durationMinutes: 7, questionCount: 1 }]);
+  assert.deepEqual(response.body.data.quizzes, [{ id: quiz.id, title: "Take me", instructions: "Select one answer.", durationMinutes: 7, questionCount: 2 }]);
 
   const attempt = await request(app).post(`/api/quizzes/${quiz.id}/start`).set("Authorization", `Bearer ${login.body.data.token}`);
   assert.equal(attempt.status, 201);
-  assert.deepEqual(attempt.body.data.quiz.questions[0].options, ["A", "B"]);
-  assert.equal("correctAnswer" in attempt.body.data.quiz.questions[0], false);
+  const displayedQuestions = attempt.body.data.quiz.questions;
+  assert.deepEqual(displayedQuestions.map(question => question.id).sort(), storedQuestions.map(question => question.id).sort());
+  assert.deepEqual(displayedQuestions.map(question => question.prompt).sort(), ["Pick A", "Pick C"]);
+  const allowedOptions = new Map([ ["Pick A", ["A", "B"]], ["Pick C", ["C", "D", "E"]] ]);
+  for (const question of displayedQuestions) {
+    assert.deepEqual([...question.options].sort(), allowedOptions.get(question.prompt));
+    assert.equal("correctAnswer" in question, false);
+  }
   assert.equal(new Date(attempt.body.data.attempt.expiresAt).getTime() - new Date(attempt.body.data.attempt.startedAt).getTime(), 7 * 60_000);
 });
 
@@ -289,6 +301,7 @@ test("requires a valid token for the authenticated account endpoint", async () =
     .set("Authorization", `Bearer ${registered.body.data.token}`);
   assert.equal(accepted.status, 200);
   assert.equal(accepted.body.data.user.email, "student@example.com");
+  assert.equal(accepted.body.data.user.role, "student");
 });
 
 
@@ -302,6 +315,7 @@ test("allows both teacher and administrator roles to create and list quizzes", a
     const login = await request(app).post("/api/auth/login")
       .send({ email: user.email, password: "correct horse battery" });
     assert.equal(login.status, 200);
+    assert.equal(login.body.data.user.role, role);
     const token = login.body.data.token;
 
     const created = await request(app)

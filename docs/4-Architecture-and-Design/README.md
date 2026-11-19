@@ -1,6 +1,6 @@
 # Architecture and Design Evidence
 
-Use the submitted [Software Architecture & Design Specification.pdf](Software%20Architecture%20%26%20Design%20Specification.pdf) as the immutable baseline. The [Mermaid diagrams](diagrams.md) render inline on GitHub; editable PlantUML sources below describe checked-in code as of 19 November 2026. Export figures to PNG/SVG only if a slide/file artifact is needed. The use-case source is not a MUL export.
+Use the submitted [Software Architecture & Design Specification.pdf](Software%20Architecture%20%26%20Design%20Specification.pdf) as the immutable baseline. The [Mermaid diagrams](diagrams.md) render inline on GitHub; editable PlantUML sources below describe checked-in code as of 19 November 2026. See the [detailed architecture and environment inventory](deployment-architecture.md) for hardware, software versions, ports, CI, role boundaries, and limitations. The use-case source is not a MUL export.
 
 ## Required items
 
@@ -9,6 +9,7 @@ Use the submitted [Software Architecture & Design Specification.pdf](Software%20
 - [x] API specification: [API.md](API.md)
 - [x] Component diagram: [components.puml](components.puml), [inline rendered figure](diagrams.md#component-view)
 - [x] Two sequence diagrams: [PlantUML sources](teacher-creates-quiz.puml) and [student-takes-quiz.puml](student-takes-quiz.puml); Mermaid versions in [diagrams.md](diagrams.md)
+- [x] Detailed deployment/software architecture and observed hardware/version inventory: [deployment-architecture.md](deployment-architecture.md)
 - [ ] Use-case diagram exported from MUL: [use-cases.puml](use-cases.puml) is an editable UML source replacement, not proof of MUL authorship/export
 - [x] Deviations from submitted SAD noted in [deviation log](../3-Requirements-Engineering/deviation-log.md)
 
